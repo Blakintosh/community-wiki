@@ -8,7 +8,6 @@ tags:
   - weapons
 authors: 
   - Scobalula
-section: software
 description: "This page provides a general rundown of how to use basic features of Alchemist."
 ---
 

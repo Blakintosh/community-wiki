@@ -11,7 +11,7 @@ tags:
   - mapping
 authors:
   - MrChuse
-section: black_ops_iii
+section: launcher
 description: "Radiant level editor"
 discord:
   enabled: true
@@ -31,13 +31,6 @@ Radiant is the Level Editor used in Call of Duty titles. It allows modders to de
 ## Main Interface
 
 #### Viewport Windows
-| Viewport         | Direction            | Purpose                         |
-| ---------------- | -------------------- | ------------------------------- |
-| Top View         | Looking Down (Z+)    | Planning layout, room placement |
-| Front View       | Looking forward (Y+) | Elevation, height adjustments   |
-| Side View        | Looking right (X+)   | Depth, corridor design          |
-| Perspective View | 3D perspective       | Final visualization, navigation |
-
 
 **Viewport**|**Direction**|**Purpose**
 :-----:|:-----:|:-----:
@@ -52,7 +45,7 @@ Perspective View | 3D perspective       | Final visualization, navigation
 - Allows adding custom property values.
 
 #### Entity Browser
-- Browse all entities registered in [APE](/docs/black_ops_iii/ape).
+- Browse all entities registered in [APE](/docs/launcher/ape).
 
 #### Prefab Browser
 - Browse all default or custom prefabs.

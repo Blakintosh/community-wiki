@@ -1,5 +1,6 @@
 ---
 title: Alchemist
+tutorial_landing: true
 tags: 
   - alchemist
   - software

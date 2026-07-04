@@ -11,7 +11,7 @@ tags:
   - assets
 authors:
   - MrChuse
-section: black_ops_iii
+section: launcher
 description: "Asset Property Editor in Black Ops III Mod Tools."
 discord:
   enabled: true
@@ -27,7 +27,7 @@ discord:
 
 ## Introduction
 
-Asset Property Editor (APE) is a tool provided within the BO3 Mod Tools that allows modders to create, modify, or view the properties of game assets. It is commonly used when importing external assets to be used in [Radiant](/docs/black_ops_iii/radiant), characters or scripts. All asset properties are saved in GDT files. 
+Asset Property Editor (APE) is a tool provided within the BO3 Mod Tools that allows modders to create, modify, or view the properties of game assets. It is commonly used when importing external assets to be used in [Radiant](/docs/launcher/radiant), characters or scripts. All asset properties are saved in GDT files. 
 
 The UI can be customized so that widgets can be closed or rearranged. To restore closed widgets, navigate to `View -> Toolbars`.
 

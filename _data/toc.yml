@@ -1,6 +1,15 @@
 # Sidebar navigation tree (grouped). Each group has a title, optional URL,
 # and a list of links. Links may have nested `children`.
 
+- title: Mod Tools Launcher
+  url: docs/launcher
+  links:
+    - title: Asset Property Editor
+      url: docs/launcher/ape
+      description: Asset property editor overview.
+    - title: Radiant
+      url: docs/launcher/radiant
+      description: Level design and asset placement tool.
 - title: Sounds
   url: docs/sounds
   links:
