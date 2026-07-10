@@ -8,7 +8,6 @@ tags:
   - weapons
 authors: 
   - Scobalula
-section: software
 description: "This page provides a download for Alchemist and previous version history."
 ---
 

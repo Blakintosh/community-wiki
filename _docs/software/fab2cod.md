@@ -24,7 +24,7 @@ Fab2Cod is a converter tool that allows you to drag and drop USDZ models downloa
 ## Download
 
 The latest version of Fab2Cod can be found on GitHub:
-- Download [Fab2Cod](https://github.com/MrChuse1/Fab2Cod/releases/tag/latest)
+- Download [Fab2Cod](https://github.com/MrChuse1/Fab2Cod/releases/latest)
 
 ## Resources
 

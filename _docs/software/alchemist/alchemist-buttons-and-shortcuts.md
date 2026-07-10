@@ -8,7 +8,6 @@ tags:
   - weapons
 authors: 
   - Scobalula
-section: software
 description: "This page describes buttons and shortcuts in Alchemist."
 ---
 
