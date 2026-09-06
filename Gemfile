@@ -23,3 +23,10 @@ gem "jekyll", "~> 4.4"
 # end
 
 gem "webrick", "~> 1.7"
+
+# Standard-library gems that Ruby 3.4 no longer bundles (Arch also ships them
+# as separate packages). Jekyll needs them at runtime.
+gem "erb"
+gem "csv"
+gem "base64"
+gem "bigdecimal"
