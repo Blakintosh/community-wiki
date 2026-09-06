@@ -12,9 +12,16 @@ tags:
   - assets
   - converter
 authors:
-    - MrChuse
+  - MrChuse
 section: software
 description: This section and document explains Fab2Cod and how to use it.
+discord:
+  enabled: true
+  forum: tutorials
+  tags:
+    - blackops3
+    - assets
+    - converter
 ---
 # Fab2Cod
 

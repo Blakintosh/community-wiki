@@ -1,11 +1,18 @@
 ---
 title: Outputs
-tags: 
+tags:
   - blackops3
   - radiant
   - ape
   - assets
   - converter
+discord:
+  enabled: true
+  forum: tutorials
+  tags:
+    - blackops3
+    - assets
+    - converter
 ---
 # Assets
 When you convert a model, it will place it will create its own folder inside the Fab directory in your Black Ops III root. If you try to convert the a model that is already in the directory, it will skip it. So make sure your models have unique names. 

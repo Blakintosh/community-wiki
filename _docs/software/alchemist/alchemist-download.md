@@ -1,14 +1,21 @@
 ---
 title: Download Alchemist
-tags: 
+tags:
   - alchemist
   - software
   - animation
   - converter
   - weapons
-authors: 
+authors:
   - Scobalula
 description: "This page provides a download for Alchemist and previous version history."
+discord:
+  enabled: true
+  forum: tutorials
+  tags:
+    - alchemist
+    - animation
+    - weapons
 ---
 
 # Download Alchemist

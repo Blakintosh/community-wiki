@@ -1,14 +1,21 @@
 ---
 title: Using Alchemist
-tags: 
+tags:
   - alchemist
   - software
   - animation
   - converter
   - weapons
-authors: 
+authors:
   - Scobalula
 description: "This page provides a general rundown of how to use basic features of Alchemist."
+discord:
+  enabled: true
+  forum: tutorials
+  tags:
+    - alchemist
+    - animation
+    - weapons
 ---
 
 # Alchemist User Guide

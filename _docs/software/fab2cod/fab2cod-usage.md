@@ -1,11 +1,18 @@
 ---
 title: Using Fab2Cod
-tags: 
+tags:
   - blackops3
   - radiant
   - ape
   - assets
   - converter
+discord:
+  enabled: true
+  forum: tutorials
+  tags:
+    - blackops3
+    - assets
+    - converter
 ---
 ## Introduction
 Fab2Cod allows you to quickly convert USDZ files to `xmodel_bin` files along with textures. All assets from a model, including mesh, materials, and textures, will be setup in a gdt file in the same directory.

@@ -1,16 +1,23 @@
 ---
 title: Alchemist
 tutorial_landing: true
-tags: 
+tags:
   - alchemist
   - software
   - animation
   - converter
   - weapons
-authors: 
+authors:
   - Scobalula
 section: software
 description: "This section and document explains Alchemist and how to use it."
+discord:
+  enabled: true
+  forum: tutorials
+  tags:
+    - alchemist
+    - animation
+    - weapons
 ---
 
 # Alchemist

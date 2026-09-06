@@ -1,14 +1,21 @@
 ---
 title: Buttons and shortcuts in Alchemist
-tags: 
+tags:
   - alchemist
   - software
   - animation
   - converter
   - weapons
-authors: 
+authors:
   - Scobalula
 description: "This page describes buttons and shortcuts in Alchemist."
+discord:
+  enabled: true
+  forum: tutorials
+  tags:
+    - alchemist
+    - animation
+    - weapons
 ---
 
 # Buttons and shortcuts in Alchemist
