@@ -25,25 +25,16 @@ layout: null
   function closeSidebar() {
     if (sidebar) sidebar.classList.remove('open');
     if (overlay) overlay.classList.remove('visible');
+    if (menuBtn) menuBtn.setAttribute('aria-expanded', 'false');
   }
   if (menuBtn && sidebar) {
     menuBtn.addEventListener('click', function () {
-      sidebar.classList.toggle('open');
-      if (overlay) overlay.classList.toggle('visible');
+      var open = sidebar.classList.toggle('open');
+      if (overlay) overlay.classList.toggle('visible', open);
+      menuBtn.setAttribute('aria-expanded', String(open));
     });
   }
   if (overlay) overlay.addEventListener('click', closeSidebar);
-
-  // -------- Hero + breadcrumb integration fallback --------
-  var main = document.querySelector('.main');
-  if (main) {
-    var hasBreadcrumbs = !!main.querySelector('nav[aria-label="breadcrumb"]');
-    var content = main.querySelector('.content');
-    var hasLeadingHero = !!(content && content.firstElementChild && content.firstElementChild.classList && content.firstElementChild.classList.contains('hero'));
-    if (hasBreadcrumbs && hasLeadingHero) {
-      main.classList.add('main--hero-with-crumbs');
-    }
-  }
 
   // -------- Mobile TOC drawer toggle --------
   var tocToggle = document.querySelector('.toc-toggle');
@@ -150,6 +141,27 @@ layout: null
     }
   }
 
+  // -------- Figures: standalone images get a rim and a numbered caption --------
+  var figureIndex = 0;
+  document.querySelectorAll('.content > p > img:only-child, .content > img').forEach(function (img) {
+    if (img.closest('figure, .doc-media, .lui-positioning-demo, a, .alert')) return;
+    var host = img.parentNode.tagName === 'P' ? img.parentNode : img;
+    figureIndex += 1;
+    var figure = document.createElement('figure');
+    figure.className = 'doc-figure';
+    var frame = document.createElement('div');
+    frame.className = 'doc-figure__frame brush';
+    host.parentNode.insertBefore(figure, host);
+    figure.appendChild(frame);
+    frame.appendChild(img);
+    if (host !== img) host.parentNode.removeChild(host);
+    var alt = (img.getAttribute('alt') || '').trim();
+    var caption = document.createElement('figcaption');
+    caption.innerHTML = '<b>fig ' + (figureIndex < 10 ? '0' : '') + figureIndex + '</b>' + (alt ? ' \u00b7 ' : '');
+    caption.appendChild(document.createTextNode(alt));
+    figure.appendChild(caption);
+  });
+
   // -------- Code blocks: line numbers + copy button --------
   function countCodeLines(codeText) {
     if (!codeText) return 1;
@@ -176,6 +188,15 @@ layout: null
 
     var toolbar = document.createElement('div');
     toolbar.className = 'code-block__toolbar';
+
+    var lang = document.createElement('span');
+    lang.className = 'code-block__lang';
+    var codeEl = pre.querySelector('code');
+    var langMatch = ((codeEl && codeEl.className) || pre.className || '').match(/language-([a-z0-9_+-]+)/i);
+    var parentHl = pre.closest('[class*="language-"]');
+    if (!langMatch && parentHl) langMatch = parentHl.className.match(/language-([a-z0-9_+-]+)/i);
+    lang.textContent = langMatch ? langMatch[1] : 'code';
+    toolbar.appendChild(lang);
 
     var btn = document.createElement('button');
     btn.type = 'button';
@@ -545,13 +566,13 @@ layout: null
   var ghForks = document.getElementById('gh-forks');
 
   function setGhStats(stars, forks) {
-    if (ghStars) ghStars.textContent = stars + ' Stars';
-    if (ghForks) ghForks.textContent = forks + ' Forks';
+    if (ghStars) ghStars.textContent = String(stars);
+    if (ghForks) ghForks.textContent = String(forks);
   }
 
   function setGhUnavailable() {
-    if (ghStars) ghStars.textContent = '? Stars';
-    if (ghForks) ghForks.textContent = '? Forks';
+    if (ghStars) ghStars.textContent = '—';
+    if (ghForks) ghForks.textContent = '—';
   }
 
   if (ghStars || ghForks) {

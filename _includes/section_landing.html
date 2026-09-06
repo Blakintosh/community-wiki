@@ -1,0 +1,35 @@
+{% comment %}
+  Section landing — panel head plus a card row for the section's guides, read
+  from the matching group in _data/toc.yml so the landing, the docs index and
+  the sidebar always agree.
+  Params: eyebrow, title, lead, toc_url (e.g. "docs/sounds").
+{% endcomment %}
+{% assign group = nil %}
+{% for s in site.data.toc %}{% if s.url == include.toc_url %}{% assign group = s %}{% endif %}{% endfor %}
+{% assign abbr = include.toc_url | split: '/' | last %}
+{% assign total = 0 %}
+{% if group %}
+  {% assign total = group.links.size %}
+  {% for l in group.links %}{% if l.children %}{% assign total = total | plus: l.children.size %}{% endif %}{% endfor %}
+{% endif %}
+
+<section class="hero">
+  <div class="hero__inner">
+    <span class="hero__eyebrow">{{ include.eyebrow }} · {{ total }} guide{% if total != 1 %}s{% endif %}</span>
+    <h1 class="hero__title">{{ include.title }}</h1>
+    {% if include.lead %}<p class="hero__lead">{{ include.lead }}</p>{% endif %}
+  </div>
+</section>
+
+{% if group %}
+<div class="card-grid">
+  {% for entry in group.links %}
+    <a class="card tone-{{ abbr }}" href="{% if entry.url %}{{ site.baseurl }}/{{ entry.url }}{% else %}{{ entry.external_url }}{% endif %}">
+      <span class="card__eyebrow">{{ abbr | replace: '-', ' ' }}</span>
+      <span class="card__title">{{ entry.title }}</span>
+      {% if entry.description %}<span class="card__desc">{{ entry.description }}</span>{% endif %}
+      <span class="card__footer"><span>{% if entry.children %}{{ entry.children | size }} sub-pages{% else %}Guide{% endif %}</span><span>&rarr;</span></span>
+    </a>
+  {% endfor %}
+</div>
+{% endif %}

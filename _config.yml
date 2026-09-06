@@ -49,7 +49,7 @@ feedback: true
 logo_pixels: 34
 
 # Theme accent (used by ::scrollbar / scroll-to-top fallback) — main palette lives in assets/css/main.css
-color: "#18181b"
+color: "#07080C"
 
 # Build settings
 markdown: kramdown

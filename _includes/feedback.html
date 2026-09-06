@@ -1,14 +1,18 @@
 {% if site.feedback %}
-<h5 class="feedback--title">Feedback</h5>
-<p class="feedback--question">Was this page helpful?</p>
-<button type="button" class="feedback--answer feedback--answer-yes">Yes</button>
-<button type="button" class="feedback--answer feedback--answer-no">No</button>
-<p class="feedback--response feedback--response-yes">
-  Glad to hear it! Please <a href="{{ site.repo }}/issues/new">tell us how we can improve</a>.
-</p>
-<p class="feedback--response feedback--response-no">
-  Sorry to hear that. Please <a href="{{ site.repo }}/issues/new">tell us how we can improve</a>.
-</p>
+<div class="feedback">
+  <div class="feedback--title">Feedback</div>
+  <div class="feedback__row">
+    <p class="feedback--question">Was this page helpful?</p>
+    <button type="button" class="btn btn--ghost btn--sm feedback--answer feedback--answer-yes">Yes</button>
+    <button type="button" class="btn btn--ghost btn--sm feedback--answer feedback--answer-no">No</button>
+  </div>
+  <p class="feedback--response feedback--response-yes">
+    Glad to hear it. Please <a href="{{ site.repo }}/issues/new">tell us how we can improve</a>.
+  </p>
+  <p class="feedback--response feedback--response-no">
+    Sorry to hear that. Please <a href="{{ site.repo }}/issues/new">tell us how we can improve</a>.
+  </p>
+</div>
 <script>
 (function () {
   var yes = document.querySelector('.feedback--answer-yes');

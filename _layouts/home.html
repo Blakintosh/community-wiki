@@ -1,27 +1,97 @@
 ---
 layout: default
 ---
-{% if page.hero %}
-<section class="hero">
-  <div class="hero__inner">
-    {% if page.hero.eyebrow %}<span class="hero__eyebrow">{{ page.hero.eyebrow }}</span>{% endif %}
-    <h1 class="hero__title">{{ page.hero.title | default: page.title }}</h1>
-    {% if page.hero.lead %}<p class="hero__lead">{{ page.hero.lead }}</p>{% endif %}
+{% comment %}
+  Home — a quiet grid hero, a HUD strip of live counts, then every guide in a
+  sectioned index table. Counts are derived from _data/toc.yml and the docs
+  collection at build time.
+{% endcomment %}
+{% assign guide_count = 0 %}
+{% assign section_count = 0 %}
+{% for s in site.data.toc %}{% if s.url contains 'docs/' %}
+  {% assign section_count = section_count | plus: 1 %}
+  {% assign guide_count = guide_count | plus: s.links.size %}
+  {% for l in s.links %}{% if l.children %}{% assign guide_count = guide_count | plus: l.children.size %}{% endif %}{% endfor %}
+{% endif %}{% endfor %}
+{% assign author_blob = "" %}
+{% for d in site.docs %}{% if d.authors %}{% assign a = d.authors | join: "," %}{% assign author_blob = author_blob | append: a | append: "," %}{% endif %}{% endfor %}
+{% assign author_list = author_blob | split: "," | uniq %}
+
+<div class="home">
+  <section class="home-hero lit-grid">
+    <div class="origin" aria-hidden="true"><span>0, 0</span></div>
+    <span class="eyebrow">{{ page.hero.eyebrow | default: 'Community wiki' }}</span>
+    <h1 class="home-hero__title">{{ page.hero.title | default: page.title }}</h1>
+    {% if page.hero.lead %}<p class="home-hero__lead">{{ page.hero.lead }}</p>{% endif %}
+
+    <form class="hero-search brush brush--sm brush--recess" action="{{ site.baseurl }}/search/" method="get" role="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="search" name="q" placeholder="{{ page.hero.search_placeholder | default: 'ambient rooms, radiant, lua widgets…' }}" aria-label="Search docs" autocomplete="off">
+      <button type="submit">Find</button>
+    </form>
+
     {% if page.hero.cta %}
-    <div class="hero__cta">
+    <div class="home-hero__actions">
       {% for c in page.hero.cta %}
-        <a class="btn {% if c.primary %}btn--primary{% endif %}"
-           href="{% if c.url contains '://' %}{{ c.url }}{% else %}{{ site.baseurl }}{{ c.url }}{% endif %}"
-           {% if c.url contains '://' %}target="_blank" rel="noopener"{% endif %}>
-          {{ c.label }}
-        </a>
+        {% if c.primary %}
+        <a class="btn btn--sm" href="{% if c.url contains '://' %}{{ c.url }}{% else %}{{ site.baseurl }}{{ c.url }}{% endif %}"{% if c.url contains '://' %} target="_blank" rel="noopener"{% endif %}>{{ c.label }}</a>
+        {% else %}
+        <a class="link-more" href="{% if c.url contains '://' %}{{ c.url }}{% else %}{{ site.baseurl }}{{ c.url }}{% endif %}"{% if c.url contains '://' %} target="_blank" rel="noopener"{% endif %}>{{ c.label }}</a>
+        {% endif %}
       {% endfor %}
     </div>
     {% endif %}
+  </section>
+
+  <div class="hud hud--band" aria-label="Wiki at a glance">
+    <div><span>Guides</span><b>{{ guide_count }}</b></div>
+    <div><span>Sections</span><b>{{ section_count }}</b></div>
+    <div><span>Built</span><b>{{ site.time | date: "%d %b %Y" }}</b></div>
+    <div><span>Contributors</span><b>{{ author_list | size }}</b></div>
   </div>
-</section>
-{% endif %}
 
-{% include tags.html %}
+  <div class="home-body">
+    <section class="home-section" aria-labelledby="index-heading">
+      <div class="home-section__head">
+        <div>
+          <span class="eyebrow">01 · Index</span>
+          <h2 id="index-heading">Every guide, by section</h2>
+        </div>
+        <a class="link-more" href="{{ site.baseurl }}/docs/">Open documentation</a>
+      </div>
 
-{{ content }}
+      <div class="index">
+        {% assign n = 0 %}
+        {% for s in site.data.toc %}{% if s.url contains 'docs/' %}
+          {% assign n = n | plus: 1 %}
+          {% assign abbr = s.url | split: '/' | last %}
+          {% assign total = s.links.size %}
+          {% for l in s.links %}{% if l.children %}{% assign total = total | plus: l.children.size %}{% endif %}{% endfor %}
+          <div class="index__row tone-{{ abbr }}">
+            <div class="index__section">
+              <div class="index__designator"><i class="swatch" aria-hidden="true"></i>{% if n < 10 %}0{% endif %}{{ n }} · {{ abbr | replace: '-', ' ' }}</div>
+              <a class="index__title" href="{{ site.baseurl }}/{{ s.url }}">{{ s.title }}</a>
+              <div class="count index__count">{{ total }} guide{% if total != 1 %}s{% endif %}</div>
+            </div>
+            <div class="index__items">
+              {% for l in s.links %}
+                <a class="index__item" href="{% if l.url %}{{ site.baseurl }}/{{ l.url }}{% else %}{{ l.external_url }}{% endif %}">
+                  <b>{{ l.title }}</b>
+                  {% if l.description %}<span>{{ l.description }}</span>{% endif %}
+                </a>
+                {% for c in l.children %}
+                <a class="index__item index__item--child" href="{% if c.url %}{{ site.baseurl }}/{{ c.url }}{% else %}{{ c.external_url }}{% endif %}">
+                  <b>{{ c.title }}</b>
+                  {% if c.description %}<span>{{ c.description }}</span>{% endif %}
+                </a>
+                {% endfor %}
+              {% endfor %}
+            </div>
+          </div>
+        {% endif %}{% endfor %}
+      </div>
+    </section>
+
+    {{ content }}
+  </div>
+</div>
