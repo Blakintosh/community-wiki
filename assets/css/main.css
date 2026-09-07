@@ -538,24 +538,31 @@ tr:hover td { background: var(--wash-hover); }
 .search-box input::placeholder { color: var(--dim); }
 .search-box input::-webkit-search-cancel-button { -webkit-appearance: none; }
 
+/* GitHub — the assetplace ghost icon button: 36px square, 20px glyph,
+   wash on hover, a 1px lift. Star count rides beside it in mono. */
 .gh-source {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 9px;
+  gap: 8px;
+  height: 36px;
+  padding: 0 10px 0 8px;
   text-decoration: none;
   color: var(--muted);
   font-family: var(--font-mono);
   font-size: var(--text-2xs);
   letter-spacing: var(--tracking-data);
+  font-variant-numeric: tabular-nums;
   white-space: nowrap;
-  padding: 8px 10px;
-  transition: color var(--t);
+  transition: color var(--t), background-color var(--t), transform var(--t);
 }
-.gh-source:hover { color: var(--teal); text-decoration: none; }
-.gh-source svg { width: 15px; height: 15px; flex: none; fill: currentColor; }
-.gh-source__facts { display: flex; gap: 10px; list-style: none; margin: 0; padding: 0; }
-.gh-source__fact::before { content: "\2605  "; }
-.gh-source__fact + .gh-source__fact::before { content: "\2442  "; }
+.gh-source:hover { color: var(--bright); background: var(--wash-hover); text-decoration: none; }
+.gh-source:focus-visible { background: var(--wash-hover); box-shadow: inset 0 0 0 1px var(--teal); outline: none; }
+@media (prefers-reduced-motion: no-preference) {
+  .gh-source:hover { transform: translateY(-1px); }
+  .gh-source:active { transform: translateY(0) scale(0.97); }
+}
+.gh-source svg { width: 20px; height: 20px; flex: none; fill: currentColor; }
+.gh-source__stars::before { content: "\2605  "; }
 
 .menu-toggle {
   display: none;
@@ -1672,7 +1679,6 @@ a.badge:hover { color: var(--teal); box-shadow: inset 0 0 0 1px var(--steel); }
   .header-spacer { display: none; }
   .site-header__inner { gap: 14px; }
   .search-box { width: 180px; margin-left: auto; }
-  .gh-source__facts li + li { display: none; }
 }
 
 @media (max-width: 720px) {

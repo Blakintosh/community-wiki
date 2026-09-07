@@ -572,22 +572,11 @@ layout: null
   window.addEventListener('scroll', updateFloatingControlPositions, { passive: true });
   window.addEventListener('resize', updateFloatingControlPositions);
 
-  // -------- GitHub stars/forks --------
+  // -------- GitHub stars --------
   var ghStars = document.getElementById('gh-stars');
-  var ghForks = document.getElementById('gh-forks');
 
-  function setGhStats(stars, forks) {
-    if (ghStars) ghStars.textContent = String(stars);
-    if (ghForks) ghForks.textContent = String(forks);
-  }
-
-  function setGhUnavailable() {
-    if (ghStars) ghStars.textContent = '—';
-    if (ghForks) ghForks.textContent = '—';
-  }
-
-  if (ghStars || ghForks) {
-    var cacheKey = 'codmods-gh-stats-v1';
+  if (ghStars) {
+    var cacheKey = 'codmods-gh-stars-v2';
     var cacheTtlMs = 6 * 60 * 60 * 1000;
     var now = Date.now();
     var cache = null;
@@ -598,36 +587,29 @@ layout: null
       cache = null;
     }
 
-    if (cache && typeof cache.stars === 'number' && typeof cache.forks === 'number') {
-      setGhStats(cache.stars, cache.forks);
-    }
+    var cached = cache && typeof cache.stars === 'number';
+    if (cached) ghStars.textContent = String(cache.stars);
 
-    if (cache && typeof cache.ts === 'number' && (now - cache.ts) < cacheTtlMs) {
-      return;
+    if (!(cached && typeof cache.ts === 'number' && (now - cache.ts) < cacheTtlMs)) {
+      var url = 'https://api.github.com/repos/{{ site.github_user }}/{{ site.github_repo }}';
+      fetch(url, { headers: { 'Accept': 'application/vnd.github.v3+json' } })
+        .then(function (r) {
+          if (!r.ok) throw new Error('github-api-' + r.status);
+          return r.json();
+        })
+        .then(function (r) {
+          var stars = Number(r && r.stargazers_count);
+          if (!Number.isFinite(stars)) throw new Error('github-invalid-data');
+          ghStars.textContent = String(stars);
+          try {
+            localStorage.setItem(cacheKey, JSON.stringify({ stars: stars, ts: now }));
+          } catch (e) {
+            // Ignore storage quota/privacy mode errors.
+          }
+        })
+        .catch(function () {
+          if (!cached) ghStars.textContent = '\u2014';
+        });
     }
-
-    var url = 'https://api.github.com/repos/{{ site.github_user }}/{{ site.github_repo }}';
-    fetch(url, { headers: { 'Accept': 'application/vnd.github.v3+json' } })
-      .then(function (r) {
-        if (!r.ok) throw new Error('github-api-' + r.status);
-        return r.json();
-      })
-      .then(function (r) {
-        if (!r) throw new Error('github-empty-response');
-        var stars = Number(r.stargazers_count);
-        var forks = Number(r.forks_count);
-        if (!Number.isFinite(stars) || !Number.isFinite(forks)) throw new Error('github-invalid-data');
-        setGhStats(stars, forks);
-        try {
-          localStorage.setItem(cacheKey, JSON.stringify({ stars: stars, forks: forks, ts: now }));
-        } catch (e) {
-          // Ignore storage quota/privacy mode errors.
-        }
-      })
-      .catch(function () {
-        if (!(cache && typeof cache.stars === 'number' && typeof cache.forks === 'number')) {
-          setGhUnavailable();
-        }
-      });
   }
 })();
