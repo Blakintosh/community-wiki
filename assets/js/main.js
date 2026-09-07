@@ -18,6 +18,17 @@ layout: null
     window.location.href = SEARCH_URL + '?q=' + encodeURIComponent(q);
   });
 
+  // -------- "/" focuses the nearest visible search box --------
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== '/' || e.ctrlKey || e.metaKey || e.altKey) return;
+    var t = e.target;
+    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+    var boxes = document.querySelectorAll('input.js-search');
+    for (var i = 0; i < boxes.length; i++) {
+      if (boxes[i].offsetParent) { e.preventDefault(); boxes[i].focus(); return; }
+    }
+  });
+
   // -------- Mobile sidebar toggle --------
   var menuBtn = document.querySelector('.menu-toggle');
   var sidebar = document.querySelector('.sidebar');

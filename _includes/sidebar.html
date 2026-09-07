@@ -1,19 +1,50 @@
+{% comment %}
+  Sidebar — the WikiSidebar component from the Datum design: a recessed
+  search, an "Index · N guides" readout, then every group from _data/toc.yml
+  on a single vertical rail. Group titles are Chakra Petch with a colour
+  tick (lit only when the group holds the current page); items carry a
+  square marker that fills teal when active. Children unfold under the
+  active parent only.
+{% endcomment %}
+{% assign guide_total = 0 %}
+{% for s in site.data.toc %}{% if s.url contains 'docs/' %}
+  {% assign guide_total = guide_total | plus: s.links.size %}
+  {% for l in s.links %}{% if l.children %}{% assign guide_total = guide_total | plus: l.children.size %}{% endif %}{% endfor %}
+{% endif %}{% endfor %}
 <aside class="sidebar" id="sidebar" aria-label="Site navigation">
-  <form class="sidebar__search" action="{{ site.baseurl }}/search/" method="get" role="search">
-    <div class="search-box brush brush--xs brush--recess">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-      <input type="search" name="q" class="js-search" placeholder="Search docs…" aria-label="Search docs" autocomplete="off">
-    </div>
-  </form>
+  <div class="sidebar__head">
+    <form class="sidebar__search" action="{{ site.baseurl }}/search/" method="get" role="search">
+      <div class="search-box brush brush--xs brush--recess">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="search" name="q" class="js-search" placeholder="Search docs" aria-label="Search docs" autocomplete="off">
+        <kbd class="search-box__key" aria-hidden="true">/</kbd>
+      </div>
+    </form>
+    <div class="sidebar__readout type-label"><span>Index</span><span>{{ guide_total }} guides</span></div>
+  </div>
 
   <nav class="nav-tree" aria-label="Documentation tree">
     {% for section in site.data.toc %}
       {% assign section_active = false %}
-      {% if section.url %}{% assign section_prefix = '/' | append: section.url | append: '/' %}{% assign page_path = page.url | append: '/' %}{% if page_path contains section_prefix %}{% assign section_active = true %}{% endif %}{% endif %}
-      <div class="nav-tree__group">
-        <a class="nav-tree__title{% if section_active %} active{% endif %}"
-           href="{% if section.url %}{{ site.baseurl }}/{{ section.url }}{% else %}{{ section.external_url }}{% endif %}">
-          {{ section.title }}
+      {% assign abbr = 'general' %}
+      {% if section.url %}
+        {% assign abbr = section.url | split: '/' | last %}
+        {% assign section_prefix = '/' | append: section.url | append: '/' %}
+        {% assign page_path = page.url | append: '/' | replace: '//', '/' %}
+        {% if page_path contains section_prefix %}{% assign section_active = true %}{% endif %}
+      {% endif %}
+      {% unless section.url %}
+        {% for entry in section.links %}{% if entry.url %}
+          {% assign entry_prefix = '/' | append: entry.url | append: '/' %}
+          {% assign page_path = page.url | append: '/' | replace: '//', '/' %}
+          {% if page_path == entry_prefix %}{% assign section_active = true %}{% endif %}
+        {% endif %}{% endfor %}
+      {% endunless %}
+      <div class="nav-tree__group tone-{{ abbr }}{% if section_active %} is-active{% endif %}">
+        <a class="nav-tree__title"
+           href="{% if section.url %}{{ site.baseurl }}/{{ section.url }}{% else %}{{ section.external_url | default: '#' }}{% endif %}">
+          <i class="nav-tree__tick" aria-hidden="true"></i>
+          <span>{{ section.title }}</span>
         </a>
         {% if section.links %}
         <ul class="nav-tree__list">
@@ -28,8 +59,10 @@
             {% endif %}
             <li class="nav-tree__item">
               <a href="{% if entry.url %}{{ site.baseurl }}/{{ entry.url }}{% else %}{{ entry.external_url }}{% endif %}"
-                 class="{% if entry_exact %}active{% endif %}"{% if entry_exact %} aria-current="page"{% endif %}>
-                {{ entry.title }}
+                 class="{% if entry_exact %}active{% elsif entry_active %}is-open{% endif %}"{% if entry_exact %} aria-current="page"{% endif %}>
+                <i class="nav-tree__dot" aria-hidden="true"></i>
+                <span>{{ entry.title }}</span>
+                <span class="nav-tree__arrow" aria-hidden="true">&#9656;</span>
               </a>
               {% if entry.children and entry_active %}
                 <ul class="nav-tree__sub">
