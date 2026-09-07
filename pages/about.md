@@ -9,11 +9,7 @@ The **CoD Mods Wiki** is a community-driven knowledge base for modding Call of D
 
 This site is published with [Jekyll](https://jekyllrb.com/) on Datum, the gscode design system, with no off-the-shelf framework dependencies.
 
-<div class="hud" aria-label="Credits">
-  <div><span>Made by</span><b>{{ site.original_author }}</b></div>
-  <div><span>Maintained by</span><b>{{ site.author }}</b></div>
-  <div><span>Licence</span><b>Docsy-derived</b></div>
-</div>
+The wiki was originally developed by **Philip/Scobalula**. It is now maintained by **Blakintosh**, **Kingslayer Kyle** and the community.
 
 ## Support
 
