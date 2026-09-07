@@ -54,23 +54,20 @@ layout: default
       <div class="home-section__head">
         <div>
           <span class="eyebrow">01 · Index</span>
-          <h2 id="index-heading">Every guide, by section</h2>
+          <h2 id="index-heading">What's covered in this wiki</h2>
         </div>
         <a class="link-more" href="{{ site.baseurl }}/docs/">Open documentation</a>
       </div>
 
       <div class="index">
-        {% assign n = 0 %}
         {% for s in site.data.toc %}{% if s.url contains 'docs/' %}
-          {% assign n = n | plus: 1 %}
           {% assign abbr = s.url | split: '/' | last %}
           {% assign total = s.links.size %}
-          {% for l in s.links %}{% if l.children %}{% assign total = total | plus: l.children.size %}{% endif %}{% endfor %}
-          <div class="index__row tone-{{ abbr }}">
+          <div class="index__row chamfer tone-{{ abbr }}">
             <div class="index__section">
-              <div class="index__designator"><i class="swatch" aria-hidden="true"></i>{% if n < 10 %}0{% endif %}{{ n }} · {{ abbr | replace: '-', ' ' }}</div>
+              <i class="swatch" aria-hidden="true"></i>
               <a class="index__title" href="{{ site.baseurl }}/{{ s.url }}">{{ s.title }}</a>
-              <div class="count index__count">{{ total }} guide{% if total != 1 %}s{% endif %}</div>
+              <div class="index__count">{{ total }} guide{% if total != 1 %}s{% endif %}</div>
             </div>
             <div class="index__items">
               {% for l in s.links %}
@@ -78,12 +75,6 @@ layout: default
                   <b>{{ l.title }}</b>
                   {% if l.description %}<span>{{ l.description }}</span>{% endif %}
                 </a>
-                {% for c in l.children %}
-                <a class="index__item index__item--child" href="{% if c.url %}{{ site.baseurl }}/{{ c.url }}{% else %}{{ c.external_url }}{% endif %}">
-                  <b>{{ c.title }}</b>
-                  {% if c.description %}<span>{{ c.description }}</span>{% endif %}
-                </a>
-                {% endfor %}
               {% endfor %}
             </div>
           </div>

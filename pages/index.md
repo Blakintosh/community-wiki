@@ -7,7 +7,7 @@ flush: true
 hero:
   eyebrow: Community wiki
   title: Documentation for modding Black Ops III
-  lead: Tutorials, tooling, and reference material for the Black Ops III mod tools — open to every Call of Duty title the community supports.
+  lead: A one-stop shop for tutorials, resources and guides on how to mod Black Ops III and use community tools.
   search_placeholder: ambient rooms, radiant, lua widgets…
   cta:
     - label: Join Discord
