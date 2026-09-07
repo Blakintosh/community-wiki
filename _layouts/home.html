@@ -19,6 +19,7 @@ layout: default
 
 <div class="home">
   <section class="home-hero lit-grid">
+   <div class="container">
     <span class="eyebrow">{{ page.hero.eyebrow | default: 'Community wiki' }}</span>
     <h1 class="home-hero__title">{{ page.hero.title | default: page.title }}</h1>
     {% if page.hero.lead %}<p class="home-hero__lead">{{ page.hero.lead }}</p>{% endif %}
@@ -40,16 +41,20 @@ layout: default
       {% endfor %}
     </div>
     {% endif %}
+   </div>
   </section>
 
-  <div class="hud hud--band" aria-label="Wiki at a glance">
-    <div><span>Guides</span><b>{{ guide_count }}</b></div>
-    <div><span>Sections</span><b>{{ section_count }}</b></div>
-    <div><span>Built</span><b>{{ site.time | date: "%d %b %Y" }}</b></div>
-    <div><span>Contributors</span><b>{{ author_list | size }}</b></div>
+  <div class="hud-band">
+    <div class="hud hud--band container" aria-label="Wiki at a glance">
+      <div><span>Guides</span><b>{{ guide_count }}</b></div>
+      <div><span>Sections</span><b>{{ section_count }}</b></div>
+      <div><span>Built</span><b>{{ site.time | date: "%d %b %Y" }}</b></div>
+      <div><span>Contributors</span><b>{{ author_list | size }}</b></div>
+    </div>
   </div>
 
   <div class="home-body">
+   <div class="container">
     <section class="home-section" aria-labelledby="index-heading">
       <div class="home-section__head">
         <div>
@@ -83,5 +88,6 @@ layout: default
     </section>
 
     {{ content }}
+   </div>
   </div>
 </div>

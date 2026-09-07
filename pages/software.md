@@ -3,6 +3,8 @@ layout: page
 title: Software
 permalink: /docs/software/
 show_title: false
+flush: true
+show_breadcrumbs: false
 description: Apps, tools, and plugins built by the community for working with Call of Duty assets, files, and game data.
 ---
 

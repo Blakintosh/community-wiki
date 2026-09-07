@@ -3,6 +3,8 @@ layout: page
 title: Mapping
 permalink: /docs/mapping/
 show_title: false
+flush: true
+show_breadcrumbs: false
 description: Guides for Radiant workflows, playable spaces, visual setup, and map-specific technical setup.
 ---
 

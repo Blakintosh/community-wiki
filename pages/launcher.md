@@ -3,6 +3,8 @@ layout: page
 title: Mod Tools Launcher
 permalink: /docs/launcher/
 show_title: false
+flush: true
+show_breadcrumbs: false
 description: Applications hosted by the Black Ops III Mod Tools Launcher.
 ---
 

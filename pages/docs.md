@@ -15,6 +15,7 @@ flush: true
 
 <div class="docs-index">
   <header class="page-head">
+   <div class="container">
     <nav aria-label="breadcrumb">
       <ol class="breadcrumbs">
         <li><a href="{{ site.baseurl }}/">Home</a></li>
@@ -24,9 +25,11 @@ flush: true
     <span class="page-head__eyebrow">Knowledge base · {{ guide_count }} guides</span>
     <h1 class="page-head__title">Documentation</h1>
     <p class="page-head__lead">Browse every guide on the wiki, grouped by topic.</p>
+   </div>
   </header>
 
   <div class="page-body">
+   <div class="container">
     {% assign n = 0 %}
     {% for section in site.data.toc %}{% if section.url contains 'docs/' %}
       {% assign n = n | plus: 1 %}
@@ -53,5 +56,6 @@ flush: true
         </div>
       </section>
     {% endif %}{% endfor %}
+   </div>
   </div>
 </div>
