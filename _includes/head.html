@@ -4,7 +4,7 @@
 <meta name="theme-color" content="#19212C">
 <META NAME="ROBOTS" CONTENT="INDEX, FOLLOW">
 
-<title>{% if page.title and page.title != site.title %}{{ page.title }} · {{ site.title }}{% else %}{{ site.title }}{% endif %}</title>
+<title>{% if page.title and page.title != site.title %}{{ page.title }} · {% endif %}{{ site.title }} · {{ site.brand }}</title>
 
 <link rel="alternate" type="application/rss+xml" href="{{ site.baseurl }}/feed.xml">
 <link rel="icon" href="{{ site.baseurl }}/assets/favicons/favicon.ico" sizes="16x16 32x32 48x48">
@@ -19,7 +19,7 @@
 <meta property="og:description" content="{% if page.description %}{{ page.description }}{% else %}{{ site.description }}{% endif %}">
 <meta property="og:type" content="website">
 <meta property="og:url" content="{{ site.url }}{{ page.url }}">
-<meta property="og:site_name" content="{{ site.title }}">
+<meta property="og:site_name" content="{{ site.title }} · {{ site.brand }}">
 <meta property="og:image" content="{% if page.thumbnail %}{{ page.thumbnail }}{% else %}{{ site.default_embed_thumb }}{% endif %}">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}">

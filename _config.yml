@@ -14,7 +14,8 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 
-title: gscode Wiki
+title: Community Wiki
+brand: gscode
 email: scobalula@gmail.com
 author: Blakintosh
 original_author: Philip/Scobalula

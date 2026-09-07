@@ -1,6 +1,6 @@
 ---
 layout: home
-title: gscode Wiki
+title: Community Wiki
 permalink: /
 show_breadcrumbs: false
 flush: true
