@@ -124,8 +124,21 @@ layout: null
   var navBacker = navTree && navTree.querySelector('.nav-tree__backer');
   if (navTree && navBacker) {
     var navLinks = navTree.querySelectorAll('.nav-tree__item > a, .nav-tree__sub a');
+    var navActive = navTree.querySelector('.nav-tree__item > a.active, .nav-tree__sub a.active');
     var moveBacker = makeSlider(navTree, navBacker);
     var hideBacker = function () { moveBacker(null); };
+    // Park it, hidden, on the current entry so the first hover fades in
+    // there instead of sliding down from the top of the tree.
+    var park = function () {
+      if (!navActive) return;
+      navBacker.style.transition = 'none';
+      moveBacker(navActive, true);
+      navBacker.classList.remove('is-on');
+      void navBacker.offsetHeight;
+      navBacker.style.transition = '';
+    };
+    park();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(park);
     navLinks.forEach(function (a) {
       a.addEventListener('mouseenter', function () { moveBacker(a, true); });
       a.addEventListener('focus', function () { moveBacker(a, true); });

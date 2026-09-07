@@ -735,6 +735,18 @@ tr:hover td { background: var(--wash-hover); }
   box-shadow: 0 0 0 2px rgba(62, 209, 189, 0.18);
 }
 .nav-tree__arrow { font-size: 10px; color: var(--teal); opacity: 0; transition: opacity var(--t); }
+/* Entries with sub-pages carry a caret: pointing right when closed, turned
+   down once the entry is open and its children are showing. */
+.nav-tree__caret {
+  flex: none;
+  width: 12px; height: 12px;
+  color: var(--dim);
+  transform: rotate(-90deg);
+  transition: color var(--t), transform var(--t-slide);
+}
+.nav-tree__item > a:hover .nav-tree__caret { color: var(--muted); }
+.nav-tree__item > a.active .nav-tree__caret,
+.nav-tree__item > a.is-open .nav-tree__caret { color: var(--teal); transform: none; }
 .nav-tree__item > a:hover { color: var(--chalk); background: var(--wash-hover); text-decoration: none; }
 .nav-tree__item > a.is-open { color: var(--chalk); }
 .nav-tree__item > a.active { color: var(--teal); position: relative; z-index: 0; }
