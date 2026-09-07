@@ -4,7 +4,7 @@
 <meta name="theme-color" content="#19212C">
 <META NAME="ROBOTS" CONTENT="INDEX, FOLLOW">
 
-<title>{% if page.title %}{{ page.title }} · {{ site.title }}{% else %}{{ site.title }}{% endif %}</title>
+<title>{% if page.title and page.title != site.title %}{{ page.title }} · {{ site.title }}{% else %}{{ site.title }}{% endif %}</title>
 
 <link rel="alternate" type="application/rss+xml" href="{{ site.baseurl }}/feed.xml">
 <link rel="icon" href="{{ site.baseurl }}/assets/favicons/favicon.ico" sizes="16x16 32x32 48x48">
