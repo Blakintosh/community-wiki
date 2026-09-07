@@ -199,22 +199,46 @@ layout: null
         });
       });
 
-      // Scrollspy
+      // Scrollspy: the current chapter is the last heading whose top has
+      // passed the fold line. Computed on load, scroll, resize and hash
+      // change, so a heading that is already scrolled in still gets marked.
       var links = tocRoot.querySelectorAll('a[data-target]');
-      var observer = new IntersectionObserver(function (entries) {
-        entries.forEach(function (entry) {
-          var id = entry.target.id;
-          var link = tocRoot.querySelector('a[data-target="' + id + '"]');
-          if (!link) return;
-          if (entry.isIntersecting) {
-            links.forEach(function (l) { l.classList.remove('active'); });
-            link.classList.add('active');
-            tocCurrent = link;
-            moveTocMarker(link, false);
-          }
-        });
-      }, { rootMargin: '-80px 0px -70% 0px', threshold: 0 });
-      headings.forEach(function (h) { observer.observe(h); });
+      var headingList = Array.prototype.slice.call(headings);
+      var spyCurrent = null;
+      var spyTicking = false;
+      function spy() {
+        spyTicking = false;
+        var line = 80 + Math.min(window.innerHeight * 0.3, 240);
+        var current = headingList[0];
+        for (var i = 0; i < headingList.length; i++) {
+          if (headingList[i].getBoundingClientRect().top <= line) current = headingList[i];
+          else break;
+        }
+        // At the very bottom, the last chapter wins even if its heading is
+        // still below the line.
+        if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2) {
+          current = headingList[headingList.length - 1];
+        }
+        if (current === spyCurrent) return;
+        spyCurrent = current;
+        var link = tocRoot.querySelector('a[data-target="' + current.id + '"]');
+        if (!link) return;
+        links.forEach(function (l) { l.classList.remove('active'); });
+        link.classList.add('active');
+        tocCurrent = link;
+        moveTocMarker(link, false);
+      }
+      function requestSpy() {
+        if (spyTicking) return;
+        spyTicking = true;
+        requestAnimationFrame(spy);
+      }
+      window.addEventListener('scroll', requestSpy, { passive: true });
+      window.addEventListener('resize', requestSpy);
+      window.addEventListener('hashchange', requestSpy);
+      window.addEventListener('load', requestSpy);
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(requestSpy);
+      spy();
     }
   }
 
