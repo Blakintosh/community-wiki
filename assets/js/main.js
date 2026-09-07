@@ -115,43 +115,32 @@ layout: null
     return to;
   }
 
-  // -------- Sidebar backer: sits on the current page, slides to the next --------
-  // Pages are full loads, so the slide is handed across: the leaving page
-  // stores where its backer was, the arriving page starts there and moves
-  // to its own entry.
+  // -------- Sidebar backer: fades in on the current page, follows the pointer --------
+  // The current entry keeps its own wash in CSS; the backer is the hover
+  // wash. It rests on the current entry, slides to whatever is hovered or
+  // focused, and returns when the pointer leaves the tree.
   var navTree = document.querySelector('.nav-tree');
   var navBacker = navTree && navTree.querySelector('.nav-tree__backer');
   if (navTree && navBacker) {
-    navTree.classList.add('has-backer');
+    var navLinks = navTree.querySelectorAll('.nav-tree__item > a, .nav-tree__sub a');
     var navActive = navTree.querySelector('.nav-tree__item > a.active, .nav-tree__sub a.active');
     var moveBacker = makeSlider(navTree, navBacker);
-    var backerKey = 'codmods-nav-backer';
     var settle = function () { moveBacker(navActive, false); };
 
-    var from = null;
-    try { from = JSON.parse(sessionStorage.getItem(backerKey) || 'null'); } catch (e) { from = null; }
+    // First render: land in place with motion off, then fade in.
     navBacker.style.transition = 'none';
-    if (from && typeof from.y === 'number') {
-      navBacker.style.setProperty('--y', from.y + 'px');
-      navBacker.style.height = from.h + 'px';
-      navBacker.classList.add('is-on');
-    } else {
-      settle();
-    }
+    settle();
+    navBacker.classList.remove('is-on');
     void navBacker.offsetHeight;
-    requestAnimationFrame(function () {
-      navBacker.style.transition = '';
-      requestAnimationFrame(settle);
-    });
+    navBacker.style.transition = '';
+    if (navActive) requestAnimationFrame(function () { navBacker.classList.add('is-on'); });
 
-    window.addEventListener('pagehide', function () {
-      try {
-        if (navActive) sessionStorage.setItem(backerKey, JSON.stringify({ y: moveBacker.measure(navActive), h: navActive.offsetHeight }));
-        else sessionStorage.removeItem(backerKey);
-      } catch (e) {
-        // Storage may be unavailable; the backer just appears in place.
-      }
+    navLinks.forEach(function (a) {
+      a.addEventListener('mouseenter', function () { moveBacker(a, true); });
+      a.addEventListener('focus', function () { moveBacker(a, true); });
     });
+    navTree.addEventListener('mouseleave', settle);
+    navTree.addEventListener('focusout', function (e) { if (!navTree.contains(e.relatedTarget)) settle(); });
     window.addEventListener('load', settle);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(settle);
     window.addEventListener('resize', settle);

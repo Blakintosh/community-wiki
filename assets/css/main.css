@@ -644,21 +644,21 @@ tr:hover td { background: var(--wash-hover); }
 /* The rail: one hairline the ticks and markers sit on. */
 .nav-tree { position: relative; list-style: none; padding: 0; margin: 0; }
 
-/* The backer: one wash that sits on the current page's entry and slides to
-   the next one when the page changes. Without JS the active entry paints
-   its own wash. */
+/* The backer: the hover wash as one element that fades in on the current
+   entry, slides to whatever is hovered, and returns when the pointer leaves.
+   The current entry keeps its own gradient wash underneath. */
 .nav-tree__backer {
   position: absolute;
   left: 0; right: 0; top: 0;
   height: 0;
   opacity: 0;
   pointer-events: none;
-  background: linear-gradient(90deg, rgba(62, 209, 189, 0.14), transparent 80%);
+  background: var(--wash-hover);
   transform: translateY(var(--y, 0));
-  transition: transform var(--t-slide), height var(--t-slide), opacity var(--t);
+  transition: transform var(--t-slide), height var(--t-slide), opacity var(--t-enter);
 }
 .nav-tree__backer.is-on { opacity: 1; }
-.nav-tree.has-backer .nav-tree__item > a.active { background: transparent; }
+.nav-tree__item > a:hover { background: transparent; }
 .nav-tree::before {
   content: "";
   position: absolute;
@@ -737,8 +737,13 @@ tr:hover td { background: var(--wash-hover); }
 .nav-tree__arrow { font-size: 10px; color: var(--teal); opacity: 0; transition: opacity var(--t); }
 .nav-tree__item > a:hover { color: var(--chalk); background: var(--wash-hover); text-decoration: none; }
 .nav-tree__item > a.is-open { color: var(--chalk); }
-.nav-tree__item > a.active {
-  color: var(--teal);
+.nav-tree__item > a.active { color: var(--teal); position: relative; z-index: 0; }
+/* The current entry's wash lives on a pseudo so it can fade in on load. */
+.nav-tree__item > a.active::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
   background: linear-gradient(90deg, rgba(62, 209, 189, 0.14), transparent 80%);
 }
 .nav-tree__item > a.active .nav-tree__dot,
@@ -750,14 +755,19 @@ tr:hover td { background: var(--wash-hover); }
 /* On arrival the current dot's ring closes in from wide, and the arrow slides
    in from the right. One-shot, motion-safe. */
 @keyframes dot-arm {
-  from { box-shadow: 0 0 0 8px rgba(62, 209, 189, 0); }
-  to   { box-shadow: 0 0 0 3px rgba(62, 209, 189, 0.25); }
+  from { background: var(--table); box-shadow: 0 0 0 8px rgba(62, 209, 189, 0); }
+  to   { background: var(--teal); box-shadow: 0 0 0 3px rgba(62, 209, 189, 0.25); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 @keyframes arrow-in {
   from { opacity: 0; transform: translateX(-4px); }
   to   { opacity: 1; transform: none; }
 }
 @media (prefers-reduced-motion: no-preference) {
+  .nav-tree__item > a.active::before { animation: fade-in 300ms var(--ease-out-cubic) both; }
   .nav-tree__item > a.active .nav-tree__dot { animation: dot-arm 300ms var(--ease-out-cubic) both; }
   .nav-tree__item > a.active .nav-tree__arrow { animation: arrow-in 200ms var(--ease-out-expo) both; }
 }
