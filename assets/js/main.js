@@ -115,35 +115,23 @@ layout: null
     return to;
   }
 
-  // -------- Sidebar backer: fades in on the current page, follows the pointer --------
-  // The current entry keeps its own wash in CSS; the backer is the hover
-  // wash. It rests on the current entry, slides to whatever is hovered or
-  // focused, and returns when the pointer leaves the tree.
+  // -------- Sidebar backer: the hover wash, and only the hover wash --------
+  // The current entry's wash is static CSS. The backer appears on the first
+  // hovered or focused entry, slides between entries, and fades out when
+  // the pointer leaves the tree. Hiding it keeps its last position so the
+  // next hover fades in from there rather than sliding from the top.
   var navTree = document.querySelector('.nav-tree');
   var navBacker = navTree && navTree.querySelector('.nav-tree__backer');
   if (navTree && navBacker) {
     var navLinks = navTree.querySelectorAll('.nav-tree__item > a, .nav-tree__sub a');
-    var navActive = navTree.querySelector('.nav-tree__item > a.active, .nav-tree__sub a.active');
     var moveBacker = makeSlider(navTree, navBacker);
-    var settle = function () { moveBacker(navActive, false); };
-
-    // First render: land in place with motion off, then fade in.
-    navBacker.style.transition = 'none';
-    settle();
-    navBacker.classList.remove('is-on');
-    void navBacker.offsetHeight;
-    navBacker.style.transition = '';
-    if (navActive) requestAnimationFrame(function () { navBacker.classList.add('is-on'); });
-
+    var hideBacker = function () { moveBacker(null); };
     navLinks.forEach(function (a) {
       a.addEventListener('mouseenter', function () { moveBacker(a, true); });
       a.addEventListener('focus', function () { moveBacker(a, true); });
     });
-    navTree.addEventListener('mouseleave', settle);
-    navTree.addEventListener('focusout', function (e) { if (!navTree.contains(e.relatedTarget)) settle(); });
-    window.addEventListener('load', settle);
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(settle);
-    window.addEventListener('resize', settle);
+    navTree.addEventListener('mouseleave', hideBacker);
+    navTree.addEventListener('focusout', function (e) { if (!navTree.contains(e.relatedTarget)) hideBacker(); });
   }
 
   // -------- Build right-rail TOC from headings --------

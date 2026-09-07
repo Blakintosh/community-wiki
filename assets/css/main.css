@@ -644,9 +644,9 @@ tr:hover td { background: var(--wash-hover); }
 /* The rail: one hairline the ticks and markers sit on. */
 .nav-tree { position: relative; list-style: none; padding: 0; margin: 0; }
 
-/* The backer: the hover wash as one element that fades in on the current
-   entry, slides to whatever is hovered, and returns when the pointer leaves.
-   The current entry keeps its own gradient wash underneath. */
+/* The backer: the hover wash as one element. It fades in on the first
+   hovered entry, slides between entries, and fades out on leave. The
+   current entry's wash is separate and never moves. */
 .nav-tree__backer {
   position: absolute;
   left: 0; right: 0; top: 0;
@@ -655,7 +655,7 @@ tr:hover td { background: var(--wash-hover); }
   pointer-events: none;
   background: var(--wash-hover);
   transform: translateY(var(--y, 0));
-  transition: transform var(--t-slide), height var(--t-slide), opacity var(--t-enter);
+  transition: transform var(--t-slide), height var(--t-slide), opacity var(--t);
 }
 .nav-tree__backer.is-on { opacity: 1; }
 .nav-tree__item > a:hover { background: transparent; }
