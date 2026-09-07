@@ -93,6 +93,70 @@ layout: null
     });
   });
 
+  // -------- Sliding markers --------
+  // A marker is one absolutely positioned element that moves to cover a link:
+  // translateY to its top, height to its box. CSS does the easing.
+  function makeSlider(root, marker) {
+    // offsetTop is relative to the nearest positioned ancestor, so walk up to
+    // the rail itself.
+    function topWithin(el) {
+      var y = 0;
+      while (el && el !== root) { y += el.offsetTop; el = el.offsetParent; }
+      return y;
+    }
+    function to(el, hover) {
+      if (!el) { marker.classList.remove('is-on'); return; }
+      marker.style.setProperty('--y', topWithin(el) + 'px');
+      marker.style.height = el.offsetHeight + 'px';
+      marker.classList.add('is-on');
+      marker.classList.toggle('is-hover', !!hover);
+    }
+    to.measure = topWithin;
+    return to;
+  }
+
+  // -------- Sidebar backer: sits on the current page, slides to the next --------
+  // Pages are full loads, so the slide is handed across: the leaving page
+  // stores where its backer was, the arriving page starts there and moves
+  // to its own entry.
+  var navTree = document.querySelector('.nav-tree');
+  var navBacker = navTree && navTree.querySelector('.nav-tree__backer');
+  if (navTree && navBacker) {
+    navTree.classList.add('has-backer');
+    var navActive = navTree.querySelector('.nav-tree__item > a.active, .nav-tree__sub a.active');
+    var moveBacker = makeSlider(navTree, navBacker);
+    var backerKey = 'codmods-nav-backer';
+    var settle = function () { moveBacker(navActive, false); };
+
+    var from = null;
+    try { from = JSON.parse(sessionStorage.getItem(backerKey) || 'null'); } catch (e) { from = null; }
+    navBacker.style.transition = 'none';
+    if (from && typeof from.y === 'number') {
+      navBacker.style.setProperty('--y', from.y + 'px');
+      navBacker.style.height = from.h + 'px';
+      navBacker.classList.add('is-on');
+    } else {
+      settle();
+    }
+    void navBacker.offsetHeight;
+    requestAnimationFrame(function () {
+      navBacker.style.transition = '';
+      requestAnimationFrame(settle);
+    });
+
+    window.addEventListener('pagehide', function () {
+      try {
+        if (navActive) sessionStorage.setItem(backerKey, JSON.stringify({ y: moveBacker.measure(navActive), h: navActive.offsetHeight }));
+        else sessionStorage.removeItem(backerKey);
+      } catch (e) {
+        // Storage may be unavailable; the backer just appears in place.
+      }
+    });
+    window.addEventListener('load', settle);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(settle);
+    window.addEventListener('resize', settle);
+  }
+
   // -------- Build right-rail TOC from headings --------
   var tocRoot = document.getElementById('TableOfContents');
   if (tocRoot) {
@@ -127,7 +191,17 @@ layout: null
         }
       });
       tocRoot.innerHTML = '';
+      var tocMarker = document.createElement('span');
+      tocMarker.className = 'toc-marker';
+      tocMarker.setAttribute('aria-hidden', 'true');
+      tocRoot.appendChild(tocMarker);
       tocRoot.appendChild(rootUl);
+      tocRoot.classList.add('has-marker');
+      var moveTocMarker = makeSlider(tocRoot, tocMarker);
+      var tocCurrent = null;
+      var resettleToc = function () { if (tocCurrent) moveTocMarker(tocCurrent, false); };
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(resettleToc);
+      window.addEventListener('resize', resettleToc);
 
       tocRoot.querySelectorAll('a').forEach(function (a) {
         a.addEventListener('click', function () {
@@ -145,6 +219,8 @@ layout: null
           if (entry.isIntersecting) {
             links.forEach(function (l) { l.classList.remove('active'); });
             link.classList.add('active');
+            tocCurrent = link;
+            moveTocMarker(link, false);
           }
         });
       }, { rootMargin: '-80px 0px -70% 0px', threshold: 0 });

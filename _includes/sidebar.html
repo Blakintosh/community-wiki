@@ -24,6 +24,7 @@
   </div>
 
   <nav class="nav-tree" aria-label="Documentation tree">
+    <span class="nav-tree__backer" aria-hidden="true"></span>
     {% for section in site.data.toc %}
       {% assign section_active = false %}
       {% assign abbr = 'general' %}

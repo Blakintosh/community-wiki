@@ -20,7 +20,7 @@ excluded_in_search: true
 :root {
   color-scheme: dark;
 
-  --ground:   #07080C;   /* page */
+  --ground:   #111317;   /* page — lifted five points, in step with assetplace and gscode */
   --panel:    #111720;   /* sidebar, hero, doc index head */
   --raise:    #19212C;   /* header, HUD strips, inline code */
   --edge:     #27333F;   /* hairlines */
@@ -83,6 +83,8 @@ excluded_in_search: true
   --t-fast: 100ms var(--ease-out-cubic);
   --t:      150ms var(--ease-out-cubic);
   --t-enter: 200ms var(--ease-out-expo);
+  --t-press: 75ms var(--ease-out-cubic);
+  --t-slide: 200ms var(--ease-out-cubic);
 }
 
 /* ---------- Reset / base ---------- */
@@ -641,6 +643,22 @@ tr:hover td { background: var(--wash-hover); }
 
 /* The rail: one hairline the ticks and markers sit on. */
 .nav-tree { position: relative; list-style: none; padding: 0; margin: 0; }
+
+/* The backer: one wash that sits on the current page's entry and slides to
+   the next one when the page changes. Without JS the active entry paints
+   its own wash. */
+.nav-tree__backer {
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(62, 209, 189, 0.14), transparent 80%);
+  transform: translateY(var(--y, 0));
+  transition: transform var(--t-slide), height var(--t-slide), opacity var(--t);
+}
+.nav-tree__backer.is-on { opacity: 1; }
+.nav-tree.has-backer .nav-tree__item > a.active { background: transparent; }
 .nav-tree::before {
   content: "";
   position: absolute;
@@ -673,8 +691,10 @@ tr:hover td { background: var(--wash-hover); }
   display: block;
   width: 18px; height: 3px;
   background: var(--edge);
-  transition: background var(--t);
+  transform-origin: left center;
+  transition: background var(--t), transform var(--t-slide);
 }
+.nav-tree__title:hover .nav-tree__tick { transform: scaleX(1.25); }
 .nav-tree__title:hover { color: var(--chalk); text-decoration: none; }
 .nav-tree__group.is-active .nav-tree__title { color: var(--chalk); }
 .nav-tree__group.is-active .nav-tree__tick { background: var(--tab-bg, var(--teal)); }
@@ -708,7 +728,11 @@ tr:hover td { background: var(--wash-hover); }
   margin-left: 6px;
   background: var(--table);
   box-shadow: inset 0 0 0 1px var(--steel);
-  transition: background var(--t), box-shadow var(--t);
+  transition: background var(--t), box-shadow var(--t), transform var(--t);
+}
+.nav-tree__item > a:hover .nav-tree__dot {
+  background: var(--steel);
+  box-shadow: 0 0 0 2px rgba(62, 209, 189, 0.18);
 }
 .nav-tree__arrow { font-size: 10px; color: var(--teal); opacity: 0; transition: opacity var(--t); }
 .nav-tree__item > a:hover { color: var(--chalk); background: var(--wash-hover); text-decoration: none; }
@@ -723,6 +747,20 @@ tr:hover td { background: var(--wash-hover); }
   box-shadow: 0 0 0 3px rgba(62, 209, 189, 0.25);
 }
 .nav-tree__item > a.active .nav-tree__arrow { opacity: 1; }
+/* On arrival the current dot's ring closes in from wide, and the arrow slides
+   in from the right. One-shot, motion-safe. */
+@keyframes dot-arm {
+  from { box-shadow: 0 0 0 8px rgba(62, 209, 189, 0); }
+  to   { box-shadow: 0 0 0 3px rgba(62, 209, 189, 0.25); }
+}
+@keyframes arrow-in {
+  from { opacity: 0; transform: translateX(-4px); }
+  to   { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .nav-tree__item > a.active .nav-tree__dot { animation: dot-arm 300ms var(--ease-out-cubic) both; }
+  .nav-tree__item > a.active .nav-tree__arrow { animation: arrow-in 200ms var(--ease-out-expo) both; }
+}
 
 /* Children hang off the rail with a short stub. */
 .nav-tree__sub { list-style: none; margin: 0; padding: 0; }
@@ -926,6 +964,22 @@ tr:hover td { background: var(--wash-hover); }
   color: var(--dim);
   margin: 0 0 10px;
 }
+#TableOfContents { position: relative; }
+/* The scrollspy marker: teal edge plus wash, sliding between headings
+   instead of snapping. Without JS the active link paints its own. */
+.toc-marker {
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+  background: var(--wash-active);
+  border-left: 2px solid var(--teal);
+  transform: translateY(var(--y, 0));
+  transition: transform var(--t-slide), height var(--t-slide), opacity var(--t);
+}
+.toc-marker.is-on { opacity: 1; }
+#TableOfContents.has-marker a.active { border-left-color: var(--edge); background: transparent; }
 #TableOfContents ul { list-style: none; margin: 0; padding: 0; }
 #TableOfContents li { margin: 0; }
 #TableOfContents a {
@@ -1024,7 +1078,7 @@ tr:hover td { background: var(--wash-hover); }
   clip-path: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut));
   background: var(--deep);
   color: var(--teal);
-  transition: background var(--t), color var(--t), filter var(--t);
+  transition: background var(--t), color var(--t), filter var(--t), transform var(--t);
 }
 .btn::before {
   content: "";
@@ -1037,7 +1091,6 @@ tr:hover td { background: var(--wash-hover); }
 }
 .btn:hover { color: var(--bright); text-decoration: none; }
 .btn:hover::before { background: var(--deep); }
-.btn:active { transform: translateY(1px); }
 .btn--primary { background: var(--grad-action); color: var(--ink); }
 .btn--primary::before { display: none; }
 .btn--primary:hover { color: var(--ink); filter: brightness(1.08); }
@@ -1047,6 +1100,12 @@ tr:hover td { background: var(--wash-hover); }
 .btn--ghost:hover { background: var(--teal); color: var(--chalk); }
 .btn--ghost:hover::before { background: var(--panel); }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+@media (prefers-reduced-motion: no-preference) {
+  .btn:hover, .hero-search button:hover { transform: translateY(-1px); }
+  .btn:active, .hero-search button:active { transform: translateY(0) scale(0.97); transition-duration: 75ms; }
+  .btn:disabled { transform: none; }
+  .card:active, .index__item:active, .index__section:active, .prevnext a:active { transform: scale(0.985); transition-duration: 100ms; }
+}
 
 /* Text link in a Sora 500 with underline — the secondary action next to a button. */
 .link-more {
@@ -1076,7 +1135,7 @@ tr:hover td { background: var(--wash-hover); }
   background: var(--rim-rest);
   padding: 36px 17px 15px;
   clip-path: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut));
-  transition: background var(--t);
+  transition: background var(--t), transform var(--t);
 }
 .card::before {
   content: "";
@@ -1250,7 +1309,7 @@ tr:hover td { background: var(--wash-hover); }
   font-size: 12.5px;
   padding: 0 22px;
   cursor: pointer;
-  transition: filter var(--t);
+  transition: filter var(--t), transform var(--t);
 }
 .hero-search button:hover { filter: brightness(1.08); }
 
@@ -1319,7 +1378,7 @@ tr:hover td { background: var(--wash-hover); }
   text-decoration: none;
   color: var(--chalk);
   border-left: 2px solid transparent;
-  transition: background-color var(--t), border-color var(--t);
+  transition: background-color var(--t), border-color var(--t), transform var(--t);
 }
 .index__item:hover { background: var(--wash-hover); border-left-color: var(--teal); color: var(--chalk); text-decoration: none; }
 .index__item b { display: block; font-family: var(--font-body); font-weight: 500; font-size: 14px; letter-spacing: -0.01em; color: var(--chalk); }
@@ -1518,6 +1577,13 @@ a.badge:hover { color: var(--teal); box-shadow: inset 0 0 0 1px var(--steel); }
 .feedback--question { font-size: 15px; color: var(--muted); margin: 0; }
 .feedback--response { display: none; margin: 12px 0 0; color: var(--muted); font-size: 14px; }
 .feedback--response__visible { display: block; }
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .feedback--response__visible { animation: rise-in var(--t-enter) both; }
+}
 
 /* ---------- Panel with active rim (about / contribute) ---------- */
 .panel { position: relative; margin: 24px 0; }
@@ -1658,12 +1724,12 @@ a.badge:hover { color: var(--teal); box-shadow: inset 0 0 0 1px var(--steel); }
     height: calc(100vh - var(--header-h));
     width: min(320px, 88vw);
     transform: translateX(100%);
-    transition: transform var(--t-enter);
+    transition: transform 150ms var(--ease-out-cubic);
     z-index: 95;
     background: var(--panel);
     box-shadow: var(--shadow-overlay);
   }
-  .toc-rail.open { transform: translateX(0); }
+  .toc-rail.open { transform: translateX(0); transition-duration: 250ms; transition-timing-function: var(--ease-out-expo); }
   .ecosystem { display: none; }
 }
 
@@ -1692,10 +1758,10 @@ a.badge:hover { color: var(--teal); box-shadow: inset 0 0 0 1px var(--steel); }
     height: calc(100vh - var(--header-h));
     z-index: 90;
     transform: translateX(-100%);
-    transition: transform var(--t-enter);
+    transition: transform 150ms var(--ease-out-cubic);
     box-shadow: none;
   }
-  .sidebar.open { transform: translateX(0); box-shadow: var(--shadow-overlay); }
+  .sidebar.open { transform: translateX(0); box-shadow: var(--shadow-overlay); transition-duration: 250ms; transition-timing-function: var(--ease-out-expo); }
   .sidebar-overlay { display: block; }
   .sidebar-overlay.visible { opacity: 1; pointer-events: auto; }
   .menu-toggle { display: inline-flex; }
