@@ -12,7 +12,7 @@ permalink: /tags/
 
 {% for tag in tags_list %}{% if tag != "" %}
 <h3 id="{{ tag | replace: '/', '-' }}" class="linked-section">#{{ tag }}</h3>
-<div class="post-list" style="margin-bottom: 2rem;">
+<div class="post-list" style="margin-bottom:2rem">
   {% for post in site.tags[tag] %}
   <div class="tag-entry">
     <a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a>
@@ -22,7 +22,7 @@ permalink: /tags/
   {% for doc in site.docs %}{% if doc.tags contains tag %}
   <div class="tag-entry">
     <a href="{{ site.baseurl }}{{ doc.url }}">{{ doc.title }}</a>
-    <span class="text-muted">Documentation</span>
+    <span class="text-muted">Guide</span>
   </div>
   {% endif %}{% endfor %}
 </div>

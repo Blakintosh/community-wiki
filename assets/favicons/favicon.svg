@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 26 26" width="104" height="104">
+  <defs>
+    <linearGradient id="datum-rim" x1="0" y1="0" x2="0.62" y2="0.79">
+      <stop offset="0" stop-color="#7BEFDD"></stop>
+      <stop offset="0.58" stop-color="#3ED1BD"></stop>
+      <stop offset="1" stop-color="#8B7BFF"></stop>
+    </linearGradient>
+    <mask id="cut">
+      <rect width="100%" height="100%" fill="white"/>
+      <!-- Chamfered edges -->
+      <path stroke="black" stroke-width="1" d="M 0 4 L 4 0 L 0 0 L 0 4 Z" fill="black"></path>
+      <path stroke="black" stroke-width="1" d="M 26 22 L 22 26 L 26 26 L 26 22 Z" fill="black"></path>
+      <!-- "Text" lines. -->
+      <path stroke="black" stroke-width="3" d="M 4 7 L 22 7" fill="none"></path>
+      <path stroke="black" stroke-width="3" d="M 4 13 L 18 13" fill="none"></path>
+      <path stroke="black" stroke-width="3" d="M 4 19 L 22 19" fill="none"></path>
+    </mask>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#datum-rim)" mask="url(#cut)" />
+</svg>

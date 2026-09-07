@@ -1,0 +1,37 @@
+{% comment %}
+  Previous / next links for docs, following the sidebar order in _data/toc.yml
+  (top-level links, then each link's children, depth first).
+{% endcomment %}
+{% assign order = "" %}
+{% for section in site.data.toc %}
+  {% for link in section.links %}
+    {% if link.url %}{% assign order = order | append: link.url | append: "^" | append: link.title | append: "|" %}{% endif %}
+    {% for child in link.children %}
+      {% if child.url %}{% assign order = order | append: child.url | append: "^" | append: child.title | append: "|" %}{% endif %}
+    {% endfor %}
+  {% endfor %}
+{% endfor %}
+{% assign entries = order | split: "|" %}
+{% assign current = page.url | append: "/" | replace: "//", "/" | remove_first: "/" | split: "/" | join: "/" %}
+{% assign idx = -1 %}
+{% for e in entries %}
+  {% assign parts = e | split: "^" %}
+  {% if parts[0] == current %}{% assign idx = forloop.index0 %}{% endif %}
+{% endfor %}
+{% if idx > -1 %}
+  {% assign prev_i = idx | minus: 1 %}
+  {% assign next_i = idx | plus: 1 %}
+  {% assign prev = nil %}{% assign next = nil %}
+  {% if prev_i >= 0 %}{% assign prev = entries[prev_i] | split: "^" %}{% endif %}
+  {% if next_i < entries.size %}{% assign next = entries[next_i] | split: "^" %}{% endif %}
+  {% if prev or next %}
+  <nav class="prevnext" aria-label="Adjacent guides">
+    {% if prev %}
+    <a class="prevnext__prev" href="{{ site.baseurl }}/{{ prev[0] }}" rel="prev"><span>&larr; Previous</span><b>{{ prev[1] }}</b></a>
+    {% else %}<span></span>{% endif %}
+    {% if next %}
+    <a class="prevnext__next" href="{{ site.baseurl }}/{{ next[0] }}" rel="next"><span>Next &rarr;</span><b>{{ next[1] }}</b></a>
+    {% endif %}
+  </nav>
+  {% endif %}
+{% endif %}

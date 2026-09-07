@@ -6,11 +6,11 @@
   <div class="app">
     {% include header.html %}
 
-    <div class="layout">
+    <div class="layout{% if page.flush %} layout--wide{% endif %}">
       {% include sidebar.html %}
 
-      <main class="main{% if page.hero %} main--has-hero{% endif %}{% if page.hero and page.url != '/' and page.show_breadcrumbs != false %} main--hero-with-crumbs{% endif %}" role="main">
-        {% if page.url != '/' and page.show_breadcrumbs != false %}
+      <main class="main{% if page.flush %} main--flush{% endif %}" role="main">
+        {% if page.url != '/' and page.show_breadcrumbs != false and page.flush != true %}
           <nav class="d-print-none" aria-label="breadcrumb">
             <ol class="breadcrumbs">
               <li><a href="{{ site.baseurl }}/">Home</a></li>
@@ -37,14 +37,15 @@
           <div class="card-grid">
             {% for child in section.links %}
               <a class="card" href="{% if child.url %}{{ site.baseurl }}{{ child.url }}{% else %}{{ child.external_url }}{% endif %}">
-                <div class="card__title">{{ child.title }}</div>
-                {% if child.description %}<p class="card__desc">{{ child.description }}</p>{% endif %}
+                <span class="card__title">{{ child.title }}</span>
+                {% if child.description %}<span class="card__desc">{{ child.description }}</span>{% endif %}
               </a>
             {% endfor %}
           </div>
           {% endif %}
 
-          {% if page.layout != 'home' %}{% include feedback.html %}{% endif %}
+          {% if page.collection == 'docs' %}{% include prevnext.html %}{% endif %}
+          {% if page.layout != 'home' and page.flush != true %}{% include feedback.html %}{% endif %}
         </article>
 
         <button class="toc-toggle d-print-none" type="button" aria-controls="TableOfContents" aria-expanded="false">
@@ -53,8 +54,8 @@
       </main>
 
       <aside class="toc-rail d-print-none" aria-label="On this page">
-        {% include editable.html %}
-        <h6 class="toc-title">On this page</h6>
+        {% unless page.not_editable %}{% include editable.html %}{% endunless %}
+        <div class="toc-title">On this page</div>
         <nav id="TableOfContents"><ul></ul></nav>
       </aside>
 

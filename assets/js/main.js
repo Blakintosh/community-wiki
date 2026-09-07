@@ -18,6 +18,17 @@ layout: null
     window.location.href = SEARCH_URL + '?q=' + encodeURIComponent(q);
   });
 
+  // -------- "/" focuses the nearest visible search box --------
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== '/' || e.ctrlKey || e.metaKey || e.altKey) return;
+    var t = e.target;
+    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+    var boxes = document.querySelectorAll('input.js-search');
+    for (var i = 0; i < boxes.length; i++) {
+      if (boxes[i].offsetParent) { e.preventDefault(); boxes[i].focus(); return; }
+    }
+  });
+
   // -------- Mobile sidebar toggle --------
   var menuBtn = document.querySelector('.menu-toggle');
   var sidebar = document.querySelector('.sidebar');
@@ -25,25 +36,16 @@ layout: null
   function closeSidebar() {
     if (sidebar) sidebar.classList.remove('open');
     if (overlay) overlay.classList.remove('visible');
+    if (menuBtn) menuBtn.setAttribute('aria-expanded', 'false');
   }
   if (menuBtn && sidebar) {
     menuBtn.addEventListener('click', function () {
-      sidebar.classList.toggle('open');
-      if (overlay) overlay.classList.toggle('visible');
+      var open = sidebar.classList.toggle('open');
+      if (overlay) overlay.classList.toggle('visible', open);
+      menuBtn.setAttribute('aria-expanded', String(open));
     });
   }
   if (overlay) overlay.addEventListener('click', closeSidebar);
-
-  // -------- Hero + breadcrumb integration fallback --------
-  var main = document.querySelector('.main');
-  if (main) {
-    var hasBreadcrumbs = !!main.querySelector('nav[aria-label="breadcrumb"]');
-    var content = main.querySelector('.content');
-    var hasLeadingHero = !!(content && content.firstElementChild && content.firstElementChild.classList && content.firstElementChild.classList.contains('hero'));
-    if (hasBreadcrumbs && hasLeadingHero) {
-      main.classList.add('main--hero-with-crumbs');
-    }
-  }
 
   // -------- Mobile TOC drawer toggle --------
   var tocToggle = document.querySelector('.toc-toggle');
@@ -91,6 +93,60 @@ layout: null
     });
   });
 
+  // -------- Sliding markers --------
+  // A marker is one absolutely positioned element that moves to cover a link:
+  // translateY to its top, height to its box. CSS does the easing.
+  function makeSlider(root, marker) {
+    // offsetTop is relative to the nearest positioned ancestor, so walk up to
+    // the rail itself.
+    function topWithin(el) {
+      var y = 0;
+      while (el && el !== root) { y += el.offsetTop; el = el.offsetParent; }
+      return y;
+    }
+    function to(el, hover) {
+      if (!el) { marker.classList.remove('is-on'); return; }
+      marker.style.setProperty('--y', topWithin(el) + 'px');
+      marker.style.height = el.offsetHeight + 'px';
+      marker.classList.add('is-on');
+      marker.classList.toggle('is-hover', !!hover);
+    }
+    to.measure = topWithin;
+    return to;
+  }
+
+  // -------- Sidebar backer: the hover wash, and only the hover wash --------
+  // The current entry's wash is static CSS. The backer appears on the first
+  // hovered or focused entry, slides between entries, and fades out when
+  // the pointer leaves the tree. Hiding it keeps its last position so the
+  // next hover fades in from there rather than sliding from the top.
+  var navTree = document.querySelector('.nav-tree');
+  var navBacker = navTree && navTree.querySelector('.nav-tree__backer');
+  if (navTree && navBacker) {
+    var navLinks = navTree.querySelectorAll('.nav-tree__item > a, .nav-tree__sub a');
+    var navActive = navTree.querySelector('.nav-tree__item > a.active, .nav-tree__sub a.active');
+    var moveBacker = makeSlider(navTree, navBacker);
+    var hideBacker = function () { moveBacker(null); };
+    // Park it, hidden, on the current entry so the first hover fades in
+    // there instead of sliding down from the top of the tree.
+    var park = function () {
+      if (!navActive) return;
+      navBacker.style.transition = 'none';
+      moveBacker(navActive, true);
+      navBacker.classList.remove('is-on');
+      void navBacker.offsetHeight;
+      navBacker.style.transition = '';
+    };
+    park();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(park);
+    navLinks.forEach(function (a) {
+      a.addEventListener('mouseenter', function () { moveBacker(a, true); });
+      a.addEventListener('focus', function () { moveBacker(a, true); });
+    });
+    navTree.addEventListener('mouseleave', hideBacker);
+    navTree.addEventListener('focusout', function (e) { if (!navTree.contains(e.relatedTarget)) hideBacker(); });
+  }
+
   // -------- Build right-rail TOC from headings --------
   var tocRoot = document.getElementById('TableOfContents');
   if (tocRoot) {
@@ -125,7 +181,17 @@ layout: null
         }
       });
       tocRoot.innerHTML = '';
+      var tocMarker = document.createElement('span');
+      tocMarker.className = 'toc-marker';
+      tocMarker.setAttribute('aria-hidden', 'true');
+      tocRoot.appendChild(tocMarker);
       tocRoot.appendChild(rootUl);
+      tocRoot.classList.add('has-marker');
+      var moveTocMarker = makeSlider(tocRoot, tocMarker);
+      var tocCurrent = null;
+      var resettleToc = function () { if (tocCurrent) moveTocMarker(tocCurrent, false); };
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(resettleToc);
+      window.addEventListener('resize', resettleToc);
 
       tocRoot.querySelectorAll('a').forEach(function (a) {
         a.addEventListener('click', function () {
@@ -133,22 +199,69 @@ layout: null
         });
       });
 
-      // Scrollspy
+      // Scrollspy: the current chapter is the last heading whose top has
+      // passed the fold line. Computed on load, scroll, resize and hash
+      // change, so a heading that is already scrolled in still gets marked.
       var links = tocRoot.querySelectorAll('a[data-target]');
-      var observer = new IntersectionObserver(function (entries) {
-        entries.forEach(function (entry) {
-          var id = entry.target.id;
-          var link = tocRoot.querySelector('a[data-target="' + id + '"]');
-          if (!link) return;
-          if (entry.isIntersecting) {
-            links.forEach(function (l) { l.classList.remove('active'); });
-            link.classList.add('active');
-          }
-        });
-      }, { rootMargin: '-80px 0px -70% 0px', threshold: 0 });
-      headings.forEach(function (h) { observer.observe(h); });
+      var headingList = Array.prototype.slice.call(headings);
+      var spyCurrent = null;
+      var spyTicking = false;
+      function spy() {
+        spyTicking = false;
+        var line = 80 + Math.min(window.innerHeight * 0.3, 240);
+        var current = headingList[0];
+        for (var i = 0; i < headingList.length; i++) {
+          if (headingList[i].getBoundingClientRect().top <= line) current = headingList[i];
+          else break;
+        }
+        // At the very bottom, the last chapter wins even if its heading is
+        // still below the line.
+        if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2) {
+          current = headingList[headingList.length - 1];
+        }
+        if (current === spyCurrent) return;
+        spyCurrent = current;
+        var link = tocRoot.querySelector('a[data-target="' + current.id + '"]');
+        if (!link) return;
+        links.forEach(function (l) { l.classList.remove('active'); });
+        link.classList.add('active');
+        tocCurrent = link;
+        moveTocMarker(link, false);
+      }
+      function requestSpy() {
+        if (spyTicking) return;
+        spyTicking = true;
+        requestAnimationFrame(spy);
+      }
+      window.addEventListener('scroll', requestSpy, { passive: true });
+      window.addEventListener('resize', requestSpy);
+      window.addEventListener('hashchange', requestSpy);
+      window.addEventListener('load', requestSpy);
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(requestSpy);
+      spy();
     }
   }
+
+  // -------- Figures: standalone images get a rim and a numbered caption --------
+  var figureIndex = 0;
+  document.querySelectorAll('.content > p > img:only-child, .content > img').forEach(function (img) {
+    if (img.closest('figure, .doc-media, .lui-positioning-demo, a, .alert')) return;
+    var host = img.parentNode.tagName === 'P' ? img.parentNode : img;
+    figureIndex += 1;
+    var figure = document.createElement('figure');
+    figure.className = 'doc-figure';
+    var frame = document.createElement('div');
+    frame.className = 'doc-figure__frame brush';
+    host.parentNode.insertBefore(figure, host);
+    figure.appendChild(frame);
+    frame.appendChild(img);
+    if (host !== img) host.parentNode.removeChild(host);
+    var alt = (img.getAttribute('alt') || '').trim();
+    var caption = document.createElement('figcaption');
+    caption.innerHTML = '<b>fig ' + (figureIndex < 10 ? '0' : '') + figureIndex + '</b>' + (alt ? ' \u00b7 ' : '');
+    caption.appendChild(document.createTextNode(alt));
+    figure.appendChild(caption);
+  });
 
   // -------- Code blocks: line numbers + copy button --------
   function countCodeLines(codeText) {
@@ -176,6 +289,15 @@ layout: null
 
     var toolbar = document.createElement('div');
     toolbar.className = 'code-block__toolbar';
+
+    var lang = document.createElement('span');
+    lang.className = 'code-block__lang';
+    var codeEl = pre.querySelector('code');
+    var langMatch = ((codeEl && codeEl.className) || pre.className || '').match(/language-([a-z0-9_+-]+)/i);
+    var parentHl = pre.closest('[class*="language-"]');
+    if (!langMatch && parentHl) langMatch = parentHl.className.match(/language-([a-z0-9_+-]+)/i);
+    lang.textContent = langMatch ? langMatch[1] : 'code';
+    toolbar.appendChild(lang);
 
     var btn = document.createElement('button');
     btn.type = 'button';
@@ -508,7 +630,8 @@ layout: null
       else st.classList.remove('visible');
     });
     st.addEventListener('click', function () {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
     });
   }
 
@@ -540,22 +663,11 @@ layout: null
   window.addEventListener('scroll', updateFloatingControlPositions, { passive: true });
   window.addEventListener('resize', updateFloatingControlPositions);
 
-  // -------- GitHub stars/forks --------
+  // -------- GitHub stars --------
   var ghStars = document.getElementById('gh-stars');
-  var ghForks = document.getElementById('gh-forks');
 
-  function setGhStats(stars, forks) {
-    if (ghStars) ghStars.textContent = stars + ' Stars';
-    if (ghForks) ghForks.textContent = forks + ' Forks';
-  }
-
-  function setGhUnavailable() {
-    if (ghStars) ghStars.textContent = '? Stars';
-    if (ghForks) ghForks.textContent = '? Forks';
-  }
-
-  if (ghStars || ghForks) {
-    var cacheKey = 'codmods-gh-stats-v1';
+  if (ghStars) {
+    var cacheKey = 'codmods-gh-stars-v2';
     var cacheTtlMs = 6 * 60 * 60 * 1000;
     var now = Date.now();
     var cache = null;
@@ -566,36 +678,29 @@ layout: null
       cache = null;
     }
 
-    if (cache && typeof cache.stars === 'number' && typeof cache.forks === 'number') {
-      setGhStats(cache.stars, cache.forks);
-    }
+    var cached = cache && typeof cache.stars === 'number';
+    if (cached) ghStars.textContent = String(cache.stars);
 
-    if (cache && typeof cache.ts === 'number' && (now - cache.ts) < cacheTtlMs) {
-      return;
+    if (!(cached && typeof cache.ts === 'number' && (now - cache.ts) < cacheTtlMs)) {
+      var url = 'https://api.github.com/repos/{{ site.github_user }}/{{ site.github_repo }}';
+      fetch(url, { headers: { 'Accept': 'application/vnd.github.v3+json' } })
+        .then(function (r) {
+          if (!r.ok) throw new Error('github-api-' + r.status);
+          return r.json();
+        })
+        .then(function (r) {
+          var stars = Number(r && r.stargazers_count);
+          if (!Number.isFinite(stars)) throw new Error('github-invalid-data');
+          ghStars.textContent = String(stars);
+          try {
+            localStorage.setItem(cacheKey, JSON.stringify({ stars: stars, ts: now }));
+          } catch (e) {
+            // Ignore storage quota/privacy mode errors.
+          }
+        })
+        .catch(function () {
+          if (!cached) ghStars.textContent = '\u2014';
+        });
     }
-
-    var url = 'https://api.github.com/repos/{{ site.github_user }}/{{ site.github_repo }}';
-    fetch(url, { headers: { 'Accept': 'application/vnd.github.v3+json' } })
-      .then(function (r) {
-        if (!r.ok) throw new Error('github-api-' + r.status);
-        return r.json();
-      })
-      .then(function (r) {
-        if (!r) throw new Error('github-empty-response');
-        var stars = Number(r.stargazers_count);
-        var forks = Number(r.forks_count);
-        if (!Number.isFinite(stars) || !Number.isFinite(forks)) throw new Error('github-invalid-data');
-        setGhStats(stars, forks);
-        try {
-          localStorage.setItem(cacheKey, JSON.stringify({ stars: stars, forks: forks, ts: now }));
-        } catch (e) {
-          // Ignore storage quota/privacy mode errors.
-        }
-      })
-      .catch(function () {
-        if (!(cache && typeof cache.stars === 'number' && typeof cache.forks === 'number')) {
-          setGhUnavailable();
-        }
-      });
   }
 })();

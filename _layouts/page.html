@@ -1,16 +1,42 @@
 ---
 layout: default
 ---
-{% if page.show_title != false and page.collection != 'docs' %}
-  <h1 style="margin-bottom:0.2em">{{ page.title }}</h1>
-  {% if page.badges %}<div style="margin: 0.4rem 0 0.6rem;">{% for badge in page.badges %}<span class="badge badge-{{ badge.type }}">{{ badge.tag }}</span> {% endfor %}</div>{% endif %}
-  {% if page.date %}<div class="post-date">{{ page.date | date: "%B %d, %Y" }}</div>{% endif %}
+{% if page.collection == 'docs' %}
+  {% comment %} Doc header: mono designator, Sora 600 title, lead, chips, meta line. {% endcomment %}
+  {% assign parts = page.url | split: '/' %}
+  {% assign slug = parts | last %}
+  {% assign parent_i = parts.size | minus: 2 %}
+  {% assign parent = parts[parent_i] %}
+  {% if page.section %}{% assign designator = page.section | replace: '_', ' ' %}{% elsif parent and parent != 'docs' %}{% assign designator = parent | replace: '-', ' ' | replace: '_', ' ' %}{% else %}{% assign designator = 'docs' %}{% endif %}
+  {% assign words = content | strip_html | number_of_words %}
+  {% assign minutes = words | divided_by: 200 | at_least: 1 %}
+  <header class="doc-header">
+    <div class="doc-header__designator">{{ designator }} · {{ slug }}</div>
+    <h1 class="doc-header__title">{{ page.title }}</h1>
+    {% if page.description %}<p class="doc-header__lead">{{ page.description }}</p>{% endif %}
+    {% include tags.html %}
+    <div class="doc-header__meta">
+      {% if page.authors %}<span>by <b>{{ page.authors | join: ', ' }}</b></span><span>·</span>{% endif %}
+      <span>{{ minutes }} min read</span>
+      {% if page.badges %}{% for badge in page.badges %}<span>·</span><span class="badge badge-{{ badge.type }}">{{ badge.tag }}</span>{% endfor %}{% endif %}
+    </div>
+  </header>
+  {% if page.tutorial_landing == true %}{% include tutorial_banner.html %}{% endif %}
+{% elsif page.show_title != false %}
+  <header class="doc-header">
+    <div class="doc-header__designator">wiki · {{ page.url | split: '/' | last | default: 'page' }}</div>
+    <h1 class="doc-header__title">{{ page.title }}</h1>
+    {% if page.description %}<p class="doc-header__lead">{{ page.description }}</p>{% endif %}
+    {% include tags.html %}
+    {% if page.badges or page.date %}
+    <div class="doc-header__meta">
+      {% if page.date %}<span>{{ page.date | date: "%B %d, %Y" }}</span>{% endif %}
+      {% if page.badges %}{% for badge in page.badges %}<span class="badge badge-{{ badge.type }}">{{ badge.tag }}</span>{% endfor %}{% endif %}
+    </div>
+    {% endif %}
+  </header>
+{% else %}
+  {% include tags.html %}
 {% endif %}
-
-{% if page.collection == 'docs' and page.tutorial_landing == true %}
-  {% include tutorial_banner.html %}
-{% endif %}
-
-{% include tags.html %}
 
 {{ content }}

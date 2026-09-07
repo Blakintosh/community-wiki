@@ -1,0 +1,48 @@
+{% comment %}
+  Section landing — the same panel head and card row as the docs index,
+  read from the matching group in _data/toc.yml so the landing, the docs
+  index and the sidebar always agree. Pages using it set `flush: true`.
+  Params: eyebrow, title, lead, toc_url (e.g. "docs/sounds").
+{% endcomment %}
+{% assign group = nil %}
+{% for s in site.data.toc %}{% if s.url == include.toc_url %}{% assign group = s %}{% endif %}{% endfor %}
+{% assign abbr = include.toc_url | split: '/' | last %}
+{% assign total = 0 %}
+{% if group %}
+  {% assign total = group.links.size %}
+  {% for l in group.links %}{% if l.children %}{% assign total = total | plus: l.children.size %}{% endif %}{% endfor %}
+{% endif %}
+
+<div class="docs-index">
+  <header class="page-head">
+   <div class="container">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumbs">
+        <li><a href="{{ site.baseurl }}/">Home</a></li>
+        <li><a href="{{ site.baseurl }}/docs/">Documentation</a></li>
+        <li class="active">{{ page.title }}</li>
+      </ol>
+    </nav>
+    <span class="page-head__eyebrow">{{ include.eyebrow }} · {{ total }} guide{% if total != 1 %}s{% endif %}</span>
+    <h1 class="page-head__title">{{ include.title }}</h1>
+    {% if include.lead %}<p class="page-head__lead">{{ include.lead }}</p>{% endif %}
+   </div>
+  </header>
+
+  {% if group %}
+  <div class="page-body page-body--landing">
+   <div class="container">
+    <div class="card-grid">
+      {% for entry in group.links %}
+        <a class="card tone-{{ abbr }}" href="{% if entry.url %}{{ site.baseurl }}/{{ entry.url }}{% else %}{{ entry.external_url }}{% endif %}">
+          <span class="card__eyebrow">{{ abbr | replace: '-', ' ' }}</span>
+          <span class="card__title">{{ entry.title }}</span>
+          {% if entry.description %}<span class="card__desc">{{ entry.description }}</span>{% endif %}
+          <span class="card__footer"><span>{% if entry.children %}{{ entry.children | size }} sub-pages{% else %}Guide{% endif %}</span><span>&rarr;</span></span>
+        </a>
+      {% endfor %}
+    </div>
+   </div>
+  </div>
+  {% endif %}
+</div>

@@ -3,4 +3,5 @@ _site
 Gemfile.lock
 build.sh
 .idea/
-.obsidian/
+.obsidian/.jekyll-cache
+.bundle/
