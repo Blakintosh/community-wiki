@@ -478,7 +478,7 @@ tr:hover td { background: var(--wash-hover); }
   transition: color var(--t);
 }
 .brand:hover { color: var(--teal); text-decoration: none; }
-.brand svg { width: 17px; height: 17px; flex: none; }
+.brand__mark { width: 17px; height: 17px; flex: none; }
 
 .nav {
   display: flex;
