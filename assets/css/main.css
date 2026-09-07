@@ -1718,18 +1718,32 @@ a.badge:hover { color: var(--teal); box-shadow: inset 0 0 0 1px var(--steel); }
   right: 24px;
   z-index: 99;
   border: 0;
-  background: var(--raise);
-  box-shadow: inset 0 0 0 1px var(--steel);
+  padding: 0;
+  background: var(--steel);
   color: var(--chalk);
   cursor: pointer;
   width: 40px; height: 40px;
   clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
-  transition: color var(--t), box-shadow var(--t);
+  transition: color var(--t), background var(--t), transform var(--t);
   align-items: center;
   justify-content: center;
 }
-#scrolltop svg { stroke-width: 1.5; }
-#scrolltop:hover { color: var(--teal); box-shadow: inset 0 0 0 1px var(--teal); }
+/* The rim is the button's own background; the body is a clipped pseudo
+   inset 1px, so the edge follows the chamfer round the cut corners. */
+#scrolltop::before {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  z-index: -1;
+  clip-path: inherit;
+  background: var(--raise);
+}
+#scrolltop svg { stroke-width: 1.5; position: relative; }
+#scrolltop:hover { color: var(--teal); background: var(--teal); }
+@media (prefers-reduced-motion: no-preference) {
+  #scrolltop:hover { transform: translateY(-1px); }
+  #scrolltop:active { transform: translateY(0) scale(0.97); transition-duration: 75ms; }
+}
 #scrolltop.visible { display: inline-flex; }
 
 /* ---------- Responsive ---------- */
