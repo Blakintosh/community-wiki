@@ -68,12 +68,12 @@ layout: default
         {% for s in site.data.toc %}{% if s.url contains 'docs/' %}
           {% assign abbr = s.url | split: '/' | last %}
           {% assign total = s.links.size %}
-          <div class="index__row chamfer tone-{{ abbr }}">
-            <div class="index__section">
+          <div class="index__row brush brush--edge tone-{{ abbr }}">
+            <a class="index__section" href="{{ site.baseurl }}/{{ s.url }}">
               <i class="swatch" aria-hidden="true"></i>
-              <a class="index__title" href="{{ site.baseurl }}/{{ s.url }}">{{ s.title }}</a>
-              <div class="index__count">{{ total }} guide{% if total != 1 %}s{% endif %}</div>
-            </div>
+              <span class="index__title">{{ s.title }}</span>
+              <span class="index__count">{{ total }} guide{% if total != 1 %}s{% endif %}</span>
+            </a>
             <div class="index__items">
               {% for l in s.links %}
                 <a class="index__item" href="{% if l.url %}{{ site.baseurl }}/{{ l.url }}{% else %}{{ l.external_url }}{% endif %}">

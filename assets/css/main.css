@@ -210,7 +210,7 @@ code, pre, kbd, samp, .type-label, .type-data { font-family: var(--font-mono); f
   position: absolute;
   left: 0; top: 0;
   z-index: 5;
-  padding: 4px 13px 4px 9px;
+  padding: 4px 13px 4px 17px;
   background: var(--tab-bg, var(--teal));
   color: var(--tab-fg, var(--ink));
   font-family: var(--font-mono);
@@ -873,6 +873,7 @@ tr:hover td { background: var(--wash-hover); }
   background: var(--ground);
   box-shadow: inset 0 14px 26px -14px rgba(0,0,0,0.85);
 }
+.page-body--landing { padding-top: 40px; }
 
 /* ---------- TOC rail ---------- */
 .toc-rail {
@@ -1084,7 +1085,7 @@ tr:hover td { background: var(--wash-hover); }
   position: absolute;
   left: 0; top: 0;
   z-index: 5;
-  padding: 4px 13px 4px 9px;
+  padding: 4px 13px 4px 17px;
   background: var(--tab-bg, var(--teal));
   color: var(--tab-fg, var(--ink));
   font-family: var(--font-mono);
@@ -1269,12 +1270,20 @@ tr:hover td { background: var(--wash-hover); }
 .index { display: grid; gap: 18px; }
 .index__row {
   --cut: 12px;
+  --brush-surface: var(--table);
   display: grid;
   grid-template-columns: 220px minmax(0, 1fr);
-  background: var(--table);
-  box-shadow: inset 0 0 0 1px var(--edge);
 }
-.index__section { padding: 22px; border-right: 1px solid #1B2530; }
+.index__section {
+  display: block;
+  padding: 22px 22px 22px 20px;
+  border-left: 2px solid transparent;
+  border-right: 1px solid #1B2530;
+  text-decoration: none;
+  transition: background-color var(--t), border-color var(--t);
+}
+.index__section:hover { background: var(--wash-hover); border-left-color: var(--teal); text-decoration: none; }
+.index__section:hover .index__title { color: var(--teal); }
 .swatch { display: block; width: 18px; height: 3px; background: var(--tab-bg, var(--steel)); flex: none; }
 .index__title {
   display: block;
@@ -1288,8 +1297,8 @@ tr:hover td { background: var(--wash-hover); }
   text-decoration: none;
   transition: color var(--t);
 }
-.index__title:hover { color: var(--teal); text-decoration: none; }
 .index__count {
+  display: block;
   margin-top: 8px;
   font-family: var(--font-mono);
   font-size: var(--text-2xs);
