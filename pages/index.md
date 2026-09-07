@@ -1,6 +1,6 @@
 ---
 layout: home
-title: CoD Mods Wiki
+title: gscode Wiki
 permalink: /
 show_breadcrumbs: false
 flush: true

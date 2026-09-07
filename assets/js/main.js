@@ -2,7 +2,7 @@
 exclude_in_search: true
 layout: null
 ---
-/* CoD Mods Wiki — theme JS (vanilla, no dependencies) */
+/* gscode Wiki — theme JS (vanilla, no dependencies) */
 (function () {
   'use strict';
 

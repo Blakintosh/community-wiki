@@ -5,7 +5,7 @@ permalink: /about/
 description: A community-driven knowledge base for modding Call of Duty.
 ---
 
-The **CoD Mods Wiki** is a community-driven knowledge base for modding Call of Duty. We focus primarily on Call of Duty: Black Ops III but welcome contributions for any title in the franchise.
+The **gscode Wiki** is a community-driven knowledge base for modding Call of Duty. We focus primarily on Call of Duty: Black Ops III but welcome contributions for any title in the franchise.
 
 This site is published with [Jekyll](https://jekyllrb.com/) on Datum, the gscode design system, with no off-the-shelf framework dependencies.
 

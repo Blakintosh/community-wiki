@@ -14,7 +14,7 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 
-title: CoD Mods Wiki
+title: gscode Wiki
 email: scobalula@gmail.com
 author: Blakintosh
 original_author: Philip/Scobalula
