@@ -39,6 +39,12 @@
     - title: Painting Volume Decals
       url: docs/mapping/painting-volume-decals
       description: Paint volume decals in Radiant for better material blending.
+    - title: Isolated Zones
+      url: docs/mapping/isolated-zones
+      description: Zones where zombies only spawn while a player is inside.
+    - title: Splitting Large Zones
+      url: docs/mapping/split-zones
+      description: Split one large area into adjacent zones to keep spawning close.
 
 - title: LUI
   url: docs/lui
